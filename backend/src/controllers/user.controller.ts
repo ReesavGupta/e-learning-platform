@@ -1,7 +1,8 @@
 import { Request, Response, RequestHandler } from 'express'
 import { User } from '../models/user.model'
+import { AuthRequest } from '../middlewares/auth.middleware'
 
-const userSignUp: RequestHandler = async (req, res) => {
+const userSignUp: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body
 
@@ -25,7 +26,7 @@ const userSignUp: RequestHandler = async (req, res) => {
   }
 }
 
-const userSignIn: RequestHandler = async (req, res) => {
+const userSignIn: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
 
@@ -48,7 +49,6 @@ const userSignIn: RequestHandler = async (req, res) => {
 
     const token = await user.generateAuthToken()
     console.log(token.toString())
-    // Send the token as an HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -64,4 +64,43 @@ const userSignIn: RequestHandler = async (req, res) => {
   }
 }
 
-export { userSignUp, userSignIn }
+const userSignOut: RequestHandler = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    })
+    res.status(200).json({ message: 'User signed out successfully' })
+    return
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error })
+  }
+}
+
+const getUserProfile: RequestHandler = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    const user = await User.findById(userId).select('-password')
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+      return
+    }
+
+    res.status(200).json(user)
+    return
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error })
+    return
+  }
+}
+
+export { userSignUp, userSignIn, userSignOut, getUserProfile }

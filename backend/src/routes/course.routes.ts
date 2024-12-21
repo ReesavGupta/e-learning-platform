@@ -17,5 +17,24 @@ router.get(
   authorize(['admin', 'instructor']),
   getAllCourses
 )
+router.get('/:_id', authMiddleware, getCourse)
+router.post(
+  '/',
+  authMiddleware,
+  authorize(['admin', 'instructor']),
+  createCourse
+)
+router.put(
+  '/:_id',
+  authMiddleware,
+  authorize(['admin', 'instructor']),
+  updateCourse
+)
+router.delete(
+  '/:_id',
+  authMiddleware,
+  authorize(['admin', 'instructor']),
+  deleteCourse
+)
 
 export default router
