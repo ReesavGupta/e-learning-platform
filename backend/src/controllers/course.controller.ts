@@ -62,17 +62,30 @@ const getAllCourses: RequestHandler = async (req: Request, res: Response) => {
         },
       },
       {
+        $unwind: {
+          path: '$instructor',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $lookup: {
           from: 'lessons',
-          foreignField: '_id',
-          localField: 'lessons',
+          let: { courseId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$course', '$$courseId'] } } },
+            { $project: { _id: 1, title: 1, content: 1, order: 1 } },
+          ],
           as: 'lessons',
         },
       },
       {
-        $unwind: {
-          path: '$instructor',
-          preserveNullAndEmptyArrays: true,
+        $project: {
+          title: 1,
+          description: 1,
+          instructor: { _id: 1, username: 1, email: 1 },
+          lessons: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ])
