@@ -12,8 +12,10 @@ app.use(cookieParser())
 
 import userRouter from './routes/user.routes'
 import courseRouter from './routes/course.routes'
+import lessonRouter from './routes/lesson.routes'
 
 app.use('/api/users', userRouter)
 app.use('/api/courses', courseRouter)
+app.use('/api/lessons', lessonRouter)
 
 export default app
