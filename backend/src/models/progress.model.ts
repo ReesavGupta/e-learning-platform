@@ -8,6 +8,10 @@ const ProgressSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+    },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Lesson',

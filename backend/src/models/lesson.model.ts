@@ -14,6 +14,10 @@ const LessonSchema = new mongoose.Schema(
     content: {
       type: String,
     },
+    order: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 )
