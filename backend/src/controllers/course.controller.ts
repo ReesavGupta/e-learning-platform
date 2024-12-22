@@ -119,23 +119,36 @@ const getCourse = async (req: Request, res: Response) => {
       {
         $lookup: {
           from: 'users',
+          foreignField: '_id',
           localField: 'instructor',
-          foreignField: '_id',
           as: 'instructor',
-        },
-      },
-      {
-        $lookup: {
-          from: 'lessons',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons',
         },
       },
       {
         $unwind: {
           path: '$instructor',
           preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'lessons',
+          let: { courseId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$course', '$$courseId'] } } },
+            { $project: { _id: 1, title: 1, content: 1, order: 1 } },
+          ],
+          as: 'lessons',
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          instructor: { _id: 1, username: 1, email: 1 },
+          lessons: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ])
