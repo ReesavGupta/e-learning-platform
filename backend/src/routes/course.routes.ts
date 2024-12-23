@@ -1,11 +1,5 @@
 import { Router } from 'express'
-import {
-  createCourse,
-  deleteCourse,
-  getAllCourses,
-  getCourse,
-  updateCourse,
-} from '../controllers/course.controller'
+import { courseController } from '../controllers/course.controller'
 import authMiddleware from '../middlewares/auth.middleware'
 import { authorize } from '../middlewares/role.middleware'
 
@@ -15,26 +9,26 @@ router.get(
   '/',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  getAllCourses
+  courseController.getAllCourses
 )
-router.get('/:_id', authMiddleware, getCourse)
+router.get('/:_id', authMiddleware, courseController.getCourse)
 router.post(
   '/',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  createCourse
+  courseController.createCourse
 )
 router.put(
   '/:_id',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  updateCourse
+  courseController.updateCourse
 )
 router.delete(
   '/:_id',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  deleteCourse
+  courseController.deleteCourse
 )
 
 export default router

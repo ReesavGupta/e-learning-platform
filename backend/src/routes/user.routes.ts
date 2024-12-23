@@ -1,19 +1,13 @@
 import express from 'express'
-import {
-  userSignUp,
-  userSignIn,
-  userSignOut,
-  getUserProfile,
-} from '../controllers/user.controller'
+import { userController } from '../controllers/user.controller'
 import authMiddleware from '../middlewares/auth.middleware'
-import { authorize } from '../middlewares/role.middleware'
 
 const router = express.Router()
 
-router.post('/signup', userSignUp)
-router.post('/signin', userSignIn)
+router.post('/signup', userController.userSignUp)
+router.post('/signin', userController.userSignIn)
 
-router.get('/signout', authMiddleware, userSignOut)
-router.get('/profile', authMiddleware, getUserProfile)
+router.get('/signout', authMiddleware, userController.userSignOut)
+router.get('/profile', authMiddleware, userController.getUserProfile)
 
 export default router

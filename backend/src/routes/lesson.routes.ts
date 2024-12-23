@@ -1,11 +1,5 @@
 import { Router } from 'express'
-import {
-  createLesson,
-  getLessonsByCourse,
-  getLessonById,
-  updateLesson,
-  deleteLesson,
-} from '../controllers/lesson.controller'
+import { lessonController } from '../controllers/lesson.controller'
 import authMiddleware from '../middlewares/auth.middleware'
 import { authorize } from '../middlewares/role.middleware'
 
@@ -15,25 +9,29 @@ router.post(
   '/',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  createLesson
+  lessonController.createLesson
 )
 
-router.get('/course/:courseId', authMiddleware, getLessonsByCourse)
+router.get(
+  '/course/:courseId',
+  authMiddleware,
+  lessonController.getLessonsByCourse
+)
 
-router.get('/:lessonId', authMiddleware, getLessonById)
+router.get('/:lessonId', authMiddleware, lessonController.getLessonById)
 
 router.put(
   '/:lessonId',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  updateLesson
+  lessonController.updateLesson
 )
 
 router.delete(
   '/:lessonId',
   authMiddleware,
   authorize(['admin', 'instructor']),
-  deleteLesson
+  lessonController.deleteLesson
 )
 
 export default router

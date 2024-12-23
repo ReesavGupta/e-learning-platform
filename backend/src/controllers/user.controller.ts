@@ -1,106 +1,106 @@
-import { Request, Response, RequestHandler } from 'express'
+import { Request, Response } from 'express'
 import { User } from '../models/user.model'
 import { AuthRequest } from '../middlewares/auth.middleware'
 
-const userSignUp: RequestHandler = async (req: Request, res: Response) => {
-  try {
-    const { username, email, password, role } = req.body
+class UserController {
+  // User Sign Up
+  public async userSignUp(req: Request, res: Response): Promise<void> {
+    try {
+      const { username, email, password, role } = req.body
 
-    if (!username || !email || !password || !role) {
-      res.status(400).json({ message: 'Please fill in all fields' })
-      return
+      if (!username || !email || !password || !role) {
+        res.status(400).json({ message: 'Please fill in all fields' })
+        return
+      }
+
+      const user = await User.findOne({ email })
+      if (user) {
+        res.status(400).json({ message: 'User already exists' })
+        return
+      }
+
+      const newUser = new User({ username, email, password, role })
+      await newUser.save()
+
+      res.status(201).json({ message: 'User created successfully' })
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error })
     }
+  }
 
-    const user = await User.findOne({ email })
-    if (user) {
-      res.status(400).json({ message: 'User already exists' })
-      return
+  // User Sign In
+  public async userSignIn(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password } = req.body
+
+      if (!email || !password) {
+        res.status(400).json({ message: 'Please fill in all fields' })
+        return
+      }
+
+      const user = await User.findOne({ email })
+      if (!user) {
+        res.status(400).json({ message: 'Invalid credentials' })
+        return
+      }
+
+      const isMatch = await user.matchPassword(password)
+      if (!isMatch) {
+        res.status(400).json({ message: 'Invalid credentials' })
+        return
+      }
+
+      const token = await user.generateAuthToken()
+      console.log(token.toString())
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 3600000, // 1 hour
+      })
+
+      res
+        .status(200)
+        .json({ token: token, message: 'User signed in successfully' })
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error })
     }
+  }
 
-    const newUser = new User({ username, email, password, role })
-    await newUser.save()
+  // User Sign Out
+  public async userSignOut(req: Request, res: Response): Promise<void> {
+    try {
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      })
+      res.status(200).json({ message: 'User signed out successfully' })
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error })
+    }
+  }
 
-    res.status(201).json({ message: 'User created successfully' })
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error })
+  // Get User Profile
+  public async getUserProfile(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id
+      if (!userId) {
+        res.status(401).json({ message: 'Unauthorized' })
+        return
+      }
+
+      const user = await User.findById(userId).select('-password')
+      if (!user) {
+        res.status(404).json({ message: 'User not found' })
+        return
+      }
+
+      res.status(200).json(user)
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error })
+    }
   }
 }
 
-const userSignIn: RequestHandler = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body
-
-    if (!email || !password) {
-      res.status(400).json({ message: 'Please fill in all fields' })
-      return
-    }
-
-    const user = await User.findOne({ email })
-    if (!user) {
-      res.status(400).json({ message: 'Invalid credentials' })
-      return
-    }
-
-    const isMatch = await user.matchPassword(password)
-    if (!isMatch) {
-      res.status(400).json({ message: 'Invalid credentials' })
-      return
-    }
-
-    const token = await user.generateAuthToken()
-    console.log(token.toString())
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600000, // 1 hour
-    })
-
-    res
-      .status(200)
-      .json({ token: token, message: 'User signed in successfully' })
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error })
-  }
-}
-
-const userSignOut: RequestHandler = async (req: Request, res: Response) => {
-  try {
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    })
-    res.status(200).json({ message: 'User signed out successfully' })
-    return
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error })
-  }
-}
-
-const getUserProfile: RequestHandler = async (
-  req: AuthRequest,
-  res: Response
-) => {
-  try {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ message: 'Unauthorized' })
-      return
-    }
-
-    const user = await User.findById(userId).select('-password')
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-      return
-    }
-
-    res.status(200).json(user)
-    return
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error })
-    return
-  }
-}
-
-export { userSignUp, userSignIn, userSignOut, getUserProfile }
+export const userController = new UserController()
