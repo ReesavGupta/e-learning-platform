@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Course } from './course.model'
+import { Lesson } from './lesson.model'
 
 interface progressDocument extends mongoose.Document {
   student: mongoose.Types.ObjectId
@@ -57,34 +58,46 @@ const ProgressSchema: mongoose.Schema<progressDocument> = new mongoose.Schema(
 )
 
 ProgressSchema.methods.updateProgress = async function () {
-  const course = await Course.findById(this.course).populate('lessons')
-  if (!course) {
+  const courseLessons = await Lesson.find({ course: this.course })
+  if (!courseLessons) {
     return
   }
-  const totalLessons = course.lessons.length
 
-  // Count how many lessons are completed
+  const totalLessons = courseLessons.length
+  courseLessons.forEach((eachCourseLesson: any) => {
+    if (
+      !this.lessons.some(
+        (progressLesson: any) =>
+          progressLesson.lessonId.toString() === eachCourseLesson._id.toString()
+      )
+    ) {
+      this.lessons.push({ lessonId: eachCourseLesson._id, completed: false })
+    }
+  })
+  console.log('this.lessons', this.lessons)
+  // Count completed lessons
   const completedLessonsCount = this.lessons.filter(
     (lesson: any) => lesson.completed
   ).length
 
   this.completedLessons = completedLessonsCount
-
-  this.progressPercentage = (this.completedLessons / totalLessons) * 100
+  this.progressPercentage = (completedLessonsCount / totalLessons) * 100
 
   await this.save()
 }
 
 ProgressSchema.methods.completeLesson = async function (lessonId: string) {
-  const lesson = this.lessons.find(
+  let lesson = this.lessons.find(
     (lesson: any) => lesson.lessonId.toString() === lessonId
   )
 
-  if (lesson && !lesson.completed) {
+  if (!lesson) {
+    this.lessons.push({ lessonId, completed: true })
+  } else if (!lesson.completed) {
     lesson.completed = true
-
-    await this.updateProgress()
   }
+
+  await this.updateProgress()
 }
 
 export const Progress = mongoose.model('Progress', ProgressSchema)

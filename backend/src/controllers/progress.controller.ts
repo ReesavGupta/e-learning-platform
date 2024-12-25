@@ -1,150 +1,146 @@
-import { Request, RequestHandler, Response } from 'express'
+import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import { Progress } from '../models/progress.model'
+import { Course } from '../models/course.model'
 import asyncHandler from '../utils/asyncHandler'
 
 class ProgressController {
   public getProgress = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      try {
-        const { studentId, courseId } = req.params
+      const { studentId, courseId } = req.params
 
-        if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
-          res.status(400).json({ message: 'Invalid student ID' })
-          return
-        }
-
-        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
-          res.status(400).json({ message: 'Invalid course ID' })
-          return
-        }
-
-        const progress = await Progress.findOne({
-          student: studentId,
-          course: courseId,
-        }).populate('lessons.lessonId', 'title')
-
-        if (!progress) {
-          res.status(404).json({ message: 'Progress not found' })
-          return
-        }
-
-        res.status(200).json({ message: 'Progress found', data: progress })
-        return
-      } catch (error) {
-        res.status(500).json({ message: 'Internal server error' })
+      if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
+        res.status(400).json({ message: 'Invalid student ID' })
         return
       }
+
+      if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+        res.status(400).json({ message: 'Invalid course ID' })
+        return
+      }
+
+      const progress = await Progress.findOne({
+        student: studentId,
+        course: courseId,
+      }).populate('lessons.lessonId', 'title')
+
+      if (!progress) {
+        res.status(404).json({ message: 'Progress not found' })
+        return
+      }
+
+      res.status(200).json({ message: 'Progress found', data: progress })
     }
   )
 
   public updateProgress = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      try {
-        const { studentId, courseId } = req.params
+      const { studentId, courseId } = req.params
 
-        if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
-          res.status(400).json({ message: 'Invalid student ID' })
-          return
-        }
-
-        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
-          res.status(400).json({ message: 'Invalid course ID' })
-          return
-        }
-
-        let progress = await Progress.findOne({
-          student: studentId,
-          course: courseId,
-        })
-
-        if (!progress) {
-          progress = await Progress.create({
-            student: studentId,
-            course: courseId,
-            lessons: [],
-          })
-        }
-
-        await progress.updateProgress()
-        res.status(200).json({ message: 'Progress updated', data: progress })
-        return
-      } catch (error) {
-        res.status(500).json({ message: 'Internal server error' })
+      if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
+        res.status(400).json({ message: 'Invalid student ID' })
         return
       }
+
+      if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+        res.status(400).json({ message: 'Invalid course ID' })
+        return
+      }
+
+      let progress = await Progress.findOne({
+        student: studentId,
+        course: courseId,
+      })
+
+      if (!progress) {
+        const course = await Course.findById(courseId).populate('lessons')
+        if (!course) {
+          res.status(404).json({ message: 'Course not found' })
+          return
+        }
+
+        progress = await Progress.create({
+          student: studentId,
+          course: courseId,
+          lessons: course.lessons.map((lesson: any) => ({
+            lessonId: lesson._id,
+            completed: false,
+          })),
+        })
+      }
+
+      await progress.updateProgress()
+      res.status(200).json({ message: 'Progress updated', data: progress })
     }
   )
+
   public completeLesson = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      try {
-        const { studentId, courseId, lessonId } = req.params
+      const { studentId, courseId, lessonId } = req.params
 
-        if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
-          res.status(400).json({ message: 'Invalid student ID' })
+      if (!studentId || !mongoose.Types.ObjectId.isValid(studentId)) {
+        res.status(400).json({ message: 'Invalid student ID' })
+        return
+      }
+
+      if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+        res.status(400).json({ message: 'Invalid course ID' })
+        return
+      }
+
+      if (!lessonId || !mongoose.Types.ObjectId.isValid(lessonId)) {
+        res.status(400).json({ message: 'Invalid lesson ID' })
+        return
+      }
+
+      let progress = await Progress.findOne({
+        student: studentId,
+        course: courseId,
+      })
+
+      if (!progress) {
+        const course = await Course.findById(courseId).populate('lessons')
+        if (!course) {
+          res.status(404).json({ message: 'Course not found' })
           return
         }
 
-        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
-          res.status(400).json({ message: 'Invalid course ID' })
-          return
-        }
-
-        if (!lessonId || !mongoose.Types.ObjectId.isValid(lessonId)) {
-          res.status(400).json({ message: 'Invalid lesson ID' })
-          return
-        }
-
-        let progress = await Progress.findOne({
+        progress = await Progress.create({
           student: studentId,
           course: courseId,
+          lessons: course.lessons.map((lesson: any) => ({
+            lessonId: lesson._id,
+            completed: false,
+          })),
         })
-
-        if (!progress) {
-          progress = await Progress.create({
-            student: studentId,
-            course: courseId,
-            lessons: [],
-          })
-        }
-
-        await progress.completeLesson(lessonId)
-
-        res.status(200).json({ message: 'Lesson completed', data: progress })
-        return
-      } catch (error) {
-        res.status(500).json({ message: 'Internal server error' })
-        return
       }
+
+      await progress.completeLesson(lessonId)
+      // await progress.updateProgress()
+      res.status(200).json({ message: 'Lesson completed', data: progress })
     }
   )
-  // Get progress for all students in a course
+
   public getCourseProgress = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      try {
-        const { courseId } = req.params
+      const { courseId } = req.params
 
-        if (!courseId) {
-          res.status(400).json({ message: 'Course ID is required' })
-          return
-        }
-
-        const progress = await Progress.find({ course: courseId }).populate(
-          'student',
-          'username email'
-        )
-
-        if (!progress || progress.length === 0) {
-          res.status(404).json({ message: 'No progress found for this course' })
-          return
-        }
-
-        res.status(200).json({ message: 'Progress for course', data: progress })
-      } catch (error) {
-        res
-          .status(500)
-          .json({ message: 'Error retrieving course progress', error })
+      if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+        res.status(400).json({ message: 'Invalid course ID' })
+        return
       }
+
+      const progress = await Progress.find({ course: courseId }).populate(
+        'student',
+        'username email'
+      )
+
+      if (!progress || progress.length === 0) {
+        res.status(404).json({ message: 'No progress found for this course' })
+        return
+      }
+
+      res.status(200).json({ message: 'Progress for course', data: progress })
     }
   )
 }

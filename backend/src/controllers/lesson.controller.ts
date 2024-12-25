@@ -33,7 +33,9 @@ class LessonController {
         content,
         order,
       })
-
+      checkCourse.lessons.push(newLesson._id)
+      checkCourse.save()
+      console.log(checkCourse.lessons)
       if (!newLesson) {
         res.status(500).json({ message: 'Error creating lesson' })
         return
