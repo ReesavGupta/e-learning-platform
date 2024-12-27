@@ -1,14 +1,14 @@
 import React from 'react'
 import { useQuery } from 'react-query'
 import { Link } from 'react-router-dom'
-import { getCourses } from '../api/courseApi'
+import { getAllCourses } from '../api/courseApi'
 
 const InstructorDashboard: React.FC = () => {
   const {
     data: courses,
     isLoading,
     error,
-  } = useQuery('instructorCourses', () => getCourses({ instructor: true }))
+  } = useQuery('instructorCourses', () => getAllCourses())
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading courses</div>

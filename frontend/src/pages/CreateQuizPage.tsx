@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useMutation } from 'react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { createQuiz } from '../api/quizApi'
+import { Quiz } from '../types'
 
 const CreateQuizPage: React.FC = () => {
   const { lessonId } = useParams<{ lessonId: string }>()
@@ -75,6 +76,7 @@ const CreateQuizPage: React.FC = () => {
             className="w-full px-3 py-2 border rounded"
           />
         </div>
+
         {questions.map((question, qIndex) => (
           <div
             key={qIndex}
@@ -136,6 +138,7 @@ const CreateQuizPage: React.FC = () => {
             </button>
           </div>
         ))}
+
         <button
           type="button"
           onClick={addQuestion}
@@ -143,6 +146,7 @@ const CreateQuizPage: React.FC = () => {
         >
           Add Question
         </button>
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

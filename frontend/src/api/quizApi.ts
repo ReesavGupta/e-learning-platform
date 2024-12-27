@@ -47,16 +47,18 @@ export const getQuizById = async (id: string): Promise<Quiz> => {
   return response.json()
 }
 
-export const updateQuiz = async (
-  id: string,
-  quizData: Partial<Quiz>
-): Promise<Quiz> => {
+export const updateQuiz = async (quizData: {
+  id: string
+  title: string
+  questions: any[]
+}): Promise<Quiz> => {
+  const { id, title, questions } = quizData
   const response = await fetch(`${QUIZ_API_URL}/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(quizData),
+    body: JSON.stringify({ title, questions }),
     credentials: 'include',
   })
 

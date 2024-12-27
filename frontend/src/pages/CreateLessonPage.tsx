@@ -2,22 +2,33 @@ import React, { useState } from 'react'
 import { useMutation } from 'react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { createLesson } from '../api/lessonApi'
+import { Lesson } from '../types' // Ensure this matches the correct path
 
 const CreateLessonPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [order, setOrder] = useState<number | undefined>(undefined)
 
   const mutation = useMutation(createLesson, {
-    onSuccess: (data) => {
+    onSuccess: (data: Lesson) => {
       navigate(`/instructor/lessons/${data.id}/edit`)
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ courseId: courseId!, title, content })
+
+    // Map courseId to course to match API expectations
+    const lessonData: Omit<Lesson, 'id'> = {
+      courseId: courseId!, // Map courseId to course
+      title,
+      content,
+      order,
+    }
+
+    mutation.mutate(lessonData)
   }
 
   return (
@@ -57,6 +68,21 @@ const CreateLessonPage: React.FC = () => {
             required
             className="w-full px-3 py-2 border rounded"
             rows={10}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="order"
+            className="block mb-1"
+          >
+            Order (Optional)
+          </label>
+          <input
+            type="number"
+            id="order"
+            value={order || ''}
+            onChange={(e) => setOrder(Number(e.target.value))}
+            className="w-full px-3 py-2 border rounded"
           />
         </div>
         <button

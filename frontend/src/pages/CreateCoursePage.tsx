@@ -6,7 +6,7 @@ import { createCourse } from '../api/courseApi'
 const CreateCoursePage: React.FC = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [price, setPrice] = useState('')
+  const [instructor, setInstructor] = useState('')
   const navigate = useNavigate()
 
   const mutation = useMutation(createCourse, {
@@ -17,20 +17,27 @@ const CreateCoursePage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ title, description, price: parseFloat(price) })
+
+    // Validate the instructor field
+    if (!instructor) {
+      alert('Instructor ID is required.')
+      return
+    }
+
+    mutation.mutate({ title, description, instructor })
   }
 
   return (
-    <div>
+    <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Create New Course</h1>
       <form
         onSubmit={handleSubmit}
-        className="max-w-md space-y-4"
+        className="max-w-lg space-y-4"
       >
         <div>
           <label
             htmlFor="title"
-            className="block mb-1"
+            className="block mb-1 font-medium"
           >
             Title
           </label>
@@ -46,7 +53,7 @@ const CreateCoursePage: React.FC = () => {
         <div>
           <label
             htmlFor="description"
-            className="block mb-1"
+            className="block mb-1 font-medium"
           >
             Description
           </label>
@@ -61,19 +68,17 @@ const CreateCoursePage: React.FC = () => {
         </div>
         <div>
           <label
-            htmlFor="price"
-            className="block mb-1"
+            htmlFor="instructor"
+            className="block mb-1 font-medium"
           >
-            Price
+            Instructor ID
           </label>
           <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            type="text"
+            id="instructor"
+            value={instructor}
+            onChange={(e) => setInstructor(e.target.value)}
             required
-            min="0"
-            step="0.01"
             className="w-full px-3 py-2 border rounded"
           />
         </div>
@@ -84,6 +89,11 @@ const CreateCoursePage: React.FC = () => {
           Create Course
         </button>
       </form>
+      {mutation.isError && (
+        <p className="text-red-500 mt-4">
+          Error: {(mutation.error as any).message}
+        </p>
+      )}
     </div>
   )
 }

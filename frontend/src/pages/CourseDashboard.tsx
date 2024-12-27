@@ -1,13 +1,13 @@
 import React from 'react'
 import { useQuery } from 'react-query'
-import { getCourses } from '../api/courseApi'
+import { getAllCourses } from '../api/courseApi'
 import { useAuth } from '../contexts/AuthContext'
 import CourseCard from '../components/CourseCard'
 import AddCourseForm from '../components/AddCourseForm'
 
 const CourseDashboard: React.FC = () => {
   const { user } = useAuth()
-  const { data: courses, isLoading, error } = useQuery('courses', getCourses)
+  const { data: courses, isLoading, error } = useQuery('courses', getAllCourses)
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading courses</div>

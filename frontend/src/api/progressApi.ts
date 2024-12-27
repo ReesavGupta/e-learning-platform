@@ -1,5 +1,6 @@
 const API_URL = '/api/progress'
 
+// Get a student's progress in a specific course
 export const getStudentCourseProgress = async (
   studentId: string,
   courseId: string
@@ -16,6 +17,7 @@ export const getStudentCourseProgress = async (
   return response.json()
 }
 
+// Update a student's progress for a course (e.g., initializing progress)
 export const updateStudentCourseProgress = async (
   studentId: string,
   courseId: string,
@@ -37,6 +39,7 @@ export const updateStudentCourseProgress = async (
   return response.json()
 }
 
+// Mark a specific lesson as complete for the student
 export const markLessonComplete = async (
   studentId: string,
   courseId: string,
@@ -57,6 +60,7 @@ export const markLessonComplete = async (
   return response.json()
 }
 
+// Get progress of all students in a specific course
 export const getCourseProgress = async (courseId: string): Promise<any> => {
   const response = await fetch(`${API_URL}/course/${courseId}`, {
     method: 'GET',

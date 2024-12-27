@@ -29,7 +29,7 @@ export const getCourseById = async (id: string): Promise<Course> => {
 }
 
 export const createCourse = async (
-  courseData: Omit<Course, 'id'>
+  courseData: Omit<Course, 'id' | 'lessons'>
 ): Promise<Course> => {
   const response = await fetch(API_URL, {
     method: 'POST',
@@ -47,16 +47,20 @@ export const createCourse = async (
   return response.json()
 }
 
-export const updateCourse = async (
-  id: string,
-  courseData: Partial<Course>
-): Promise<Course> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+export const updateCourse = async (courseData: {
+  id: string
+  title: string
+  description: string
+}): Promise<Course> => {
+  const response = await fetch(`${API_URL}/${courseData.id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(courseData),
+    body: JSON.stringify({
+      title: courseData.title,
+      description: courseData.description,
+    }),
     credentials: 'include',
   })
 

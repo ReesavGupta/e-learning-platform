@@ -18,15 +18,22 @@ const EditLessonPage: React.FC = () => {
   useEffect(() => {
     if (lesson) {
       setTitle(lesson.title)
-      setContent(lesson.content)
+      setContent(lesson.content || '')
     }
   }, [lesson])
 
-  const updateMutation = useMutation(updateLesson, {
-    onSuccess: () => {
-      navigate(`/courses/${lesson?.courseId}`)
-    },
-  })
+  const updateMutation = useMutation(
+    (lessonData: { lessonId: string; title: string; content: string }) =>
+      updateLesson(lessonData.lessonId, {
+        title: lessonData.title,
+        content: lessonData.content,
+      }),
+    {
+      onSuccess: () => {
+        navigate(`/courses/${lesson?.courseId}`)
+      },
+    }
+  )
 
   const deleteMutation = useMutation(deleteLesson, {
     onSuccess: () => {
@@ -36,7 +43,11 @@ const EditLessonPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateMutation.mutate({ id: lessonId!, title, content })
+    updateMutation.mutate({
+      lessonId: lessonId!,
+      title,
+      content,
+    })
   }
 
   const handleDelete = () => {

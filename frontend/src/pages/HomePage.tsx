@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
-import { getCourses } from '../api/courseApi'
+import { getAllCourses } from '../api/courseApi'
 import CourseCard from '../components/CourseCard'
 
 const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const { data: courses, isLoading, error } = useQuery('courses', getCourses)
+  const { data: courses, isLoading, error } = useQuery('courses', getAllCourses)
 
   const filteredCourses = courses?.filter(
     (course) =>

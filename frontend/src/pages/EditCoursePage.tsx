@@ -8,7 +8,6 @@ const EditCoursePage: React.FC = () => {
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [price, setPrice] = useState('')
 
   const {
     data: course,
@@ -20,15 +19,18 @@ const EditCoursePage: React.FC = () => {
     if (course) {
       setTitle(course.title)
       setDescription(course.description)
-      setPrice(course.price.toString())
     }
   }, [course])
 
-  const updateMutation = useMutation(updateCourse, {
-    onSuccess: () => {
-      navigate('/instructor/dashboard')
-    },
-  })
+  const updateMutation = useMutation(
+    (courseData: { id: string; title: string; description: string }) =>
+      updateCourse(courseData),
+    {
+      onSuccess: () => {
+        navigate('/instructor/dashboard')
+      },
+    }
+  )
 
   const deleteMutation = useMutation(deleteCourse, {
     onSuccess: () => {
@@ -42,7 +44,6 @@ const EditCoursePage: React.FC = () => {
       id: courseId!,
       title,
       description,
-      price: parseFloat(price),
     })
   }
 
@@ -94,24 +95,7 @@ const EditCoursePage: React.FC = () => {
             rows={4}
           />
         </div>
-        <div>
-          <label
-            htmlFor="price"
-            className="block mb-1"
-          >
-            Price
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-            min="0"
-            step="0.01"
-            className="w-full px-3 py-2 border rounded"
-          />
-        </div>
+
         <div className="flex justify-between">
           <button
             type="submit"

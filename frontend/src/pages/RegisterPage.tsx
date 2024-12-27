@@ -106,7 +106,9 @@ const RegisterPage: React.FC = () => {
         </button>
       </form>
       {mutation.isError && (
-        <p className="text-red-500 mt-4">Error: {mutation.error.message}</p>
+        <p className="text-red-500 mt-4">
+          Error: {(mutation.error as any).message}
+        </p>
       )}
     </div>
   )

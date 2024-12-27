@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
-import { createCourse } from '../api/courseApi'
+import { createCourse } from '../api/courseApi' // Adjust the import to your actual createCourse function path
 
 const AddCourseForm: React.FC = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [price, setPrice] = useState('')
+  const [instructor, setInstructor] = useState('')
+  const [lessons, setLessons] = useState<string[]>([])
   const queryClient = useQueryClient()
 
   const mutation = useMutation(createCourse, {
@@ -13,13 +14,14 @@ const AddCourseForm: React.FC = () => {
       queryClient.invalidateQueries('courses')
       setTitle('')
       setDescription('')
-      setPrice('')
+      setInstructor('')
+      setLessons([])
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ title, description, price: parseFloat(price) })
+    mutation.mutate({ title, description, instructor, lessons })
   }
 
   return (
@@ -60,19 +62,35 @@ const AddCourseForm: React.FC = () => {
       </div>
       <div>
         <label
-          htmlFor="price"
+          htmlFor="instructor"
           className="block mb-1"
         >
-          Price
+          Instructor
         </label>
         <input
-          type="number"
-          id="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          type="text"
+          id="instructor"
+          value={instructor}
+          onChange={(e) => setInstructor(e.target.value)}
           required
-          min="0"
-          step="0.01"
+          className="w-full px-3 py-2 border rounded"
+        />
+      </div>
+      <div>
+        <label
+          htmlFor="lessons"
+          className="block mb-1"
+        >
+          Lessons (comma separated)
+        </label>
+        <input
+          type="text"
+          id="lessons"
+          value={lessons.join(', ')}
+          onChange={(e) =>
+            setLessons(e.target.value.split(',').map((lesson) => lesson.trim()))
+          }
+          required
           className="w-full px-3 py-2 border rounded"
         />
       </div>
