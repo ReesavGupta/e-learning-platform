@@ -6,7 +6,7 @@ import { authorize } from '../middlewares/role.middleware'
 const router = Router()
 
 router.post(
-  '/',
+  '/:courseId',
   authMiddleware,
   authorize(['admin', 'instructor']),
   lessonController.createLesson

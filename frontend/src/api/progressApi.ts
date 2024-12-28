@@ -1,4 +1,4 @@
-const API_URL = '/api/progress'
+const API_URL = 'http://localhost:3000/api/progress'
 
 // Get a student's progress in a specific course
 export const getStudentCourseProgress = async (

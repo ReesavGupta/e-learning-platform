@@ -1,13 +1,14 @@
 export interface User {
-  id: string
-  name: string
+  _id: string
+  username: string
   email: string
   role: 'student' | 'instructor' | 'admin'
   createdAt?: string
   updatedAt?: string
 }
+
 export interface Lesson {
-  id: string
+  _id: string
   courseId: string
   title: string
   content?: string
@@ -17,7 +18,7 @@ export interface Lesson {
 }
 
 export interface Course {
-  id: string
+  _id: string
   title: string
   description: string
   instructor: string
@@ -25,12 +26,14 @@ export interface Course {
   createdAt?: string
   updatedAt?: string
 }
+
 export interface Option {
   text: string
   isCorrect: boolean
 }
 
 export interface Question {
+  id: string // Added id to uniquely identify each question
   text: string
   options: Option[]
 }
@@ -39,7 +42,7 @@ export interface Quiz {
   id: string
   lessonId: string
   title: string
-  questions: Question[] // Change from string[] to Question[]
+  questions: Question[] // Changed from string[] to Question[] to hold full question objects
   createdAt?: string
   updatedAt?: string
 }

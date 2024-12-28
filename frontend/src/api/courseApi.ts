@@ -1,6 +1,6 @@
 import { Course } from '../types'
 
-const API_URL = '/api/courses'
+const API_URL = 'http://localhost:3000/api/courses'
 
 export const getAllCourses = async (): Promise<Course[]> => {
   const response = await fetch(API_URL, {

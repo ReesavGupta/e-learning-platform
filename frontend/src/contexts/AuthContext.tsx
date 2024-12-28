@@ -30,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = (userData: User) => {
     setUser(userData)
+    console.log('this is user data: ', userData)
   }
 
   const logout = () => {

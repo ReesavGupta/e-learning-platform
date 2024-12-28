@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-query'
-import { getQuiz, submitQuizAnswers } from '../api/quizApi'
-import { useAuth } from '../contexts/AuthContext'
+import { getQuizById, submitQuizAnswers } from '../api/quizApi'
 
 const QuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
 
@@ -15,13 +13,19 @@ const QuizPage: React.FC = () => {
     data: quiz,
     isLoading,
     error,
-  } = useQuery(['quiz', quizId], () => getQuiz(quizId!))
-
-  const submitMutation = useMutation(submitQuizAnswers, {
-    onSuccess: () => {
-      setSubmitted(true)
-    },
+  } = useQuery(['quiz', quizId], () => getQuizById(quizId!), {
+    enabled: !!quizId, // Only fetch if quizId exists
   })
+
+  const submitMutation = useMutation(
+    (data: { quizId: string; answers: Record<string, number> }) =>
+      submitQuizAnswers(data.quizId, data.answers),
+    {
+      onSuccess: () => {
+        setSubmitted(true)
+      },
+    }
+  )
 
   const handleAnswerChange = (questionId: string, optionIndex: number) => {
     setAnswers({ ...answers, [questionId]: optionIndex })
@@ -29,7 +33,7 @@ const QuizPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (quiz) {
+    if (quiz && quiz.id) {
       submitMutation.mutate({ quizId: quiz.id, answers })
     }
   }
@@ -85,7 +89,7 @@ const QuizPage: React.FC = () => {
             soon.
           </p>
           <button
-            onClick={() => navigate(`/courses/${quiz?.courseId}`)}
+            onClick={() => navigate(`/courses/${quiz?.lessonId}`)}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Back to Course

@@ -21,11 +21,11 @@ const LessonList: React.FC<LessonListProps> = ({ courseId }) => {
     <ul className="space-y-2">
       {lessons?.map((lesson) => (
         <li
-          key={lesson.id}
+          key={lesson._id}
           className="bg-white p-4 rounded shadow"
         >
           <Link
-            to={`/lessons/${lesson.id}`}
+            to={`/lessons/${lesson._id}`}
             className="text-blue-600 hover:underline"
           >
             {lesson.title}

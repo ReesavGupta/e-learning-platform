@@ -24,7 +24,7 @@ const CreateCoursePage: React.FC = () => {
       return
     }
 
-    mutation.mutate({ title, description, instructor })
+    mutation.mutate({ _id: '', title, description, instructor })
   }
 
   return (

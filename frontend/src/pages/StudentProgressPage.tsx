@@ -33,7 +33,7 @@ const StudentProgressPage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {progress?.map((studentProgress) => (
+          {progress?.map((studentProgress: any) => (
             <tr key={studentProgress.studentId}>
               <td className="border border-gray-300 px-4 py-2">
                 {studentProgress.studentName}

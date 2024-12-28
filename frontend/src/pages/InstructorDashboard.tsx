@@ -25,20 +25,20 @@ const InstructorDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses?.map((course) => (
           <div
-            key={course.id}
+            key={course._id}
             className="bg-white p-4 rounded shadow"
           >
             <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
             <p className="text-gray-600 mb-4">{course.description}</p>
             <div className="flex justify-between">
               <Link
-                to={`/instructor/courses/${course.id}/edit`}
+                to={`/instructor/courses/${course._id}/edit`}
                 className="text-blue-600 hover:underline"
               >
                 Edit Course
               </Link>
               <Link
-                to={`/instructor/courses/${course.id}/progress`}
+                to={`/instructor/courses/${course._id}/progress`}
                 className="text-green-600 hover:underline"
               >
                 View Progress

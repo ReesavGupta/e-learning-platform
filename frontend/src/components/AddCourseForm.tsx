@@ -21,7 +21,7 @@ const AddCourseForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ title, description, instructor, lessons })
+    mutation.mutate({ title, description, instructor, lessons})
   }
 
   return (
@@ -90,7 +90,7 @@ const AddCourseForm: React.FC = () => {
           onChange={(e) =>
             setLessons(e.target.value.split(',').map((lesson) => lesson.trim()))
           }
-          required
+          // required
           className="w-full px-3 py-2 border rounded"
         />
       </div>

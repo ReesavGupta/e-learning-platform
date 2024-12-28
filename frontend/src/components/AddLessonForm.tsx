@@ -23,7 +23,7 @@ const AddLessonForm: React.FC<AddLessonFormProps> = ({ courseId }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ course: courseId, title, content, order })
+    mutation.mutate({ courseId: courseId, title, content, order })
   }
 
   return (

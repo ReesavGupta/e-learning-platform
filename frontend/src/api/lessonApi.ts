@@ -1,17 +1,22 @@
 import { Lesson } from '../types'
 
-const API_URL = '/api/lessons'
+const API_URL = 'http://localhost:3000/api/lessons'
 
 export const createLesson = async (
-  lessonData: Omit<Lesson, 'id'>
+  lessonData: Omit<Lesson, '_id'> & { courseId: string }
 ): Promise<Lesson> => {
-  const response = await fetch(API_URL, {
+  // Send the courseId as part of the URL
+  const response = await fetch(`${API_URL}/${lessonData.courseId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(lessonData),
-    credentials: 'include',
+    body: JSON.stringify({
+      title: lessonData.title,
+      content: lessonData.content,
+      order: lessonData.order,
+    }),
+    credentials: 'include', // Ensure the user is authenticated via cookies
   })
 
   if (!response.ok) {
@@ -32,8 +37,8 @@ export const getLessonsByCourse = async (
   if (!response.ok) {
     throw new Error('Failed to fetch lessons')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result.data
 }
 
 export const getLessonById = async (lessonId: string): Promise<Lesson> => {
@@ -45,8 +50,8 @@ export const getLessonById = async (lessonId: string): Promise<Lesson> => {
   if (!response.ok) {
     throw new Error('Failed to fetch lesson')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result.data
 }
 
 export const updateLesson = async (

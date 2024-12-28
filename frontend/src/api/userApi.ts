@@ -1,6 +1,6 @@
 import { User } from '../types'
 
-const API_URL = '/api/users'
+const API_URL = 'http://localhost:3000/api/users'
 
 export const signUp = async (userData: {
   name: string
@@ -13,12 +13,17 @@ export const signUp = async (userData: {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(userData),
+    body: JSON.stringify({
+      username: userData.name,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role,
+    }),
     credentials: 'include', // This tells fetch to include cookies
   })
 
   if (!response.ok) {
-    throw new Error('Failed to sign up')
+    throw new Error('Failed to sign up' + console.error(response))
   }
 
   return response.json()

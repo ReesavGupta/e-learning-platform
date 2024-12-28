@@ -1,7 +1,7 @@
 import { Quiz, Question } from '../types'
 
-const QUIZ_API_URL = '/api/quizzes'
-const QUESTION_API_URL = '/api/questions'
+const QUIZ_API_URL = 'http://localhost:3000/api/quizzes'
+const QUESTION_API_URL = 'http://localhost:3000/api/questions'
 
 // Quiz Routes
 export const createQuiz = async (quizData: Omit<Quiz, 'id'>): Promise<Quiz> => {

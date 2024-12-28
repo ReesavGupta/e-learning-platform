@@ -8,20 +8,19 @@ class LessonController {
   // Create a new lesson
   public createLesson = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      const { courseId, title, content, order } = req.body
+      const { courseId } = req.params
+      const { title, content, order } = req.body
 
       if (!courseId || !title) {
         res.status(400).json({ message: 'course and title are required' })
         return
       }
-
       if (!mongoose.Types.ObjectId.isValid(courseId)) {
         res.status(400).json({ message: 'Invalid course id' })
         return
       }
 
       const checkCourse = await Course.findById(courseId)
-
       if (!checkCourse) {
         res.status(404).json({ message: 'Course not found' })
         return
@@ -35,7 +34,6 @@ class LessonController {
       })
       checkCourse.lessons.push(newLesson._id)
       checkCourse.save()
-      console.log(checkCourse.lessons)
       if (!newLesson) {
         res.status(500).json({ message: 'Error creating lesson' })
         return

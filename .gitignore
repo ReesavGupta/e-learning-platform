@@ -1,2 +1,231 @@
+# Node.js
+node_modules/
+dist/
 .env
-node_modules
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Next.js build output
+.next/
+
+# Nuxt.js build output
+.nuxt/
+dist/
+
+# Gatsby files
+.cache/
+public/
+
+# Vue.js build output
+dist/
+*.local
+
+# Storybook files
+.storybook/
+out/
+
+# Svelte build output
+public/build/
+
+# Angular build output
+dist/
+tmp/
+
+# Ember.js build output
+dist/
+tmp/
+
+# Gridsome build output
+dist/
+assets/
+
+# Cache files
+.cache/
+.parcel-cache/
+
+# Static site generators
+public/
+output/
+site/
+
+# Docusaurus
+.build/
+
+# Hexo
+public/
+
+# Jekyll
+_site/
+
+# Hugo
+public/
+
+# Eleventy
+_site/
+
+# Metalsmith
+build/
+
+# Middleman
+build/
+
+# Brunch
+public/
+
+# Harp
+public/
+
+# Assemble
+dist/
+
+# Jigsaw
+build_local/
+
+# WebdriverIO
+allure-results/
+allure-report/
+logs/
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
+# Playwright
+playwright-report/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output/
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Next.js build output
+.next/
+
+# Nuxt.js build output
+.nuxt/
+dist/
+
+# Gatsby files
+.cache/
+public/
+
+# Vue.js build output
+dist/
+*.local
+
+# Storybook files
+.storybook/
+out/
+
+# Svelte build output
+public/build/
+
+# Angular build output
+dist/
+tmp/
+
+# Ember.js build output
+dist/
+tmp/
+
+# Gridsome build output
+dist/
+assets/
+
+# Cache files
+.cache/
+.parcel-cache/
+
+# Static site generators
+public/
+output/
+site/
+
+# Docusaurus
+.build/
+
+# Hexo
+public/
+
+# Jekyll
+_site/
+
+# Hugo
+public/
+
+# Eleventy
+_site/
+
+# Metalsmith
+build/
+
+# Middleman
+build/
+
+# Brunch
+public/
+
+# Harp
+public/
+
+# Assemble
+dist/
+
+# Jigsaw
+build_local/
+
+# WebdriverIO
+allure-results/
+allure-report/

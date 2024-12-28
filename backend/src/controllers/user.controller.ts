@@ -9,12 +9,12 @@ class UserController {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const { username, email, password, role } = req.body
-
+        console.log(req.body)
         if (!username || !email || !password || !role) {
           res.status(400).json({ message: 'Please fill in all fields' })
           return
         }
-
+        console.log('here')
         const user = await User.findOne({ email })
         if (user) {
           res.status(400).json({ message: 'User already exists' })
@@ -63,9 +63,7 @@ class UserController {
           maxAge: 3600000, // 1 hour
         })
 
-        res
-          .status(200)
-          .json({ token: token, message: 'User signed in successfully' })
+        res.status(200).json(user)
       } catch (error) {
         res.status(500).json({ message: 'Internal server error', error })
       }
