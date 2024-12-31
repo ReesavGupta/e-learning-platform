@@ -31,6 +31,7 @@ export const getCourseById = async (id: string): Promise<Course> => {
 export const createCourse = async (
   courseData: Omit<Course, 'id' | 'lessons'>
 ): Promise<Course> => {
+  console.log('inside api: ', courseData)
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -52,14 +53,19 @@ export const updateCourse = async (courseData: {
   title: string
   description: string
 }): Promise<Course> => {
-  const response = await fetch(`${API_URL}/${courseData.id}`, {
+  const courseDataToSend = {
+    title: courseData.title,
+    description: courseData.description,
+    _id: courseData.id,
+  }
+  const response = await fetch(`${API_URL}/${courseDataToSend._id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      title: courseData.title,
-      description: courseData.description,
+      title: courseDataToSend.title,
+      description: courseDataToSend.description,
     }),
     credentials: 'include',
   })
@@ -67,8 +73,8 @@ export const updateCourse = async (courseData: {
   if (!response.ok) {
     throw new Error('Failed to update course')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }
 
 export const deleteCourse = async (
@@ -82,6 +88,6 @@ export const deleteCourse = async (
   if (!response.ok) {
     throw new Error('Failed to delete course')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }

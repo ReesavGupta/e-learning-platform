@@ -26,6 +26,12 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           >
             View Course
           </Link>
+          <Link
+            to={`/instructor/courses/${course._id}/edit`}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Edit Course
+          </Link>
         </div>
       </div>
     </div>

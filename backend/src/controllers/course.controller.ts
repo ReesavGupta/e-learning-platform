@@ -183,24 +183,21 @@ class CourseController {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const courseId = req.params._id
-        const { title, description, instructor } = req.body
+        const { title, description } = req.body
 
-        if (!title || !description || !instructor) {
+        if (!title || !description) {
           res.status(400).json({ message: 'Please fill in all fields' })
           return
         }
 
-        if (
-          !mongoose.Types.ObjectId.isValid(courseId) ||
-          !mongoose.Types.ObjectId.isValid(instructor)
-        ) {
-          res.status(400).json({ message: 'Invalid course or instructor ID' })
+        if (!mongoose.Types.ObjectId.isValid(courseId)) {
+          res.status(400).json({ message: 'Invalid course' })
           return
         }
 
         const updatedCourse = await Course.findByIdAndUpdate(
           courseId,
-          { title, description, instructor },
+          { title, description },
           { new: true }
         )
 

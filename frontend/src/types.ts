@@ -9,7 +9,7 @@ export interface User {
 
 export interface Lesson {
   _id: string
-  courseId: string
+  course: Course
   title: string
   content?: string
   order?: number
@@ -21,7 +21,7 @@ export interface Course {
   _id: string
   title: string
   description: string
-  instructor: string
+  instructor?: User
   lessons?: string[]
   createdAt?: string
   updatedAt?: string
@@ -33,13 +33,13 @@ export interface Option {
 }
 
 export interface Question {
-  id: string // Added id to uniquely identify each question
+  _id: string // Added id to uniquely identify each question
   text: string
   options: Option[]
 }
 
 export interface Quiz {
-  id: string
+  _id: string
   lessonId: string
   title: string
   questions: Question[] // Changed from string[] to Question[] to hold full question objects

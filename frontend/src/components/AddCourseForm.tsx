@@ -1,27 +1,40 @@
 import React, { useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import { createCourse } from '../api/courseApi' // Adjust the import to your actual createCourse function path
+import { useNavigate } from 'react-router-dom'
+interface AddCourseFormProps {
+  instructor: string | undefined
+}
 
-const AddCourseForm: React.FC = () => {
+const AddCourseForm: React.FC<AddCourseFormProps> = ({
+  instructor: initialInstructor,
+}) => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [instructor, setInstructor] = useState('')
+  const [instructor, setInstructor] = useState(initialInstructor || '')
   const [lessons, setLessons] = useState<string[]>([])
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  console.log('Inside AddCourseForm:', initialInstructor)
 
   const mutation = useMutation(createCourse, {
     onSuccess: () => {
       queryClient.invalidateQueries('courses')
       setTitle('')
       setDescription('')
-      setInstructor('')
+      setInstructor(initialInstructor || '')
       setLessons([])
+      navigate('/courses')
+    },
+    onError: (error: any) => {
+      console.error('Error creating course:', error)
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ title, description, instructor, lessons})
+    console.log({ title, description, instructor, lessons })
+    mutation.mutate({ title, description, instructor, lessons })
   }
 
   return (
@@ -62,22 +75,6 @@ const AddCourseForm: React.FC = () => {
       </div>
       <div>
         <label
-          htmlFor="instructor"
-          className="block mb-1"
-        >
-          Instructor
-        </label>
-        <input
-          type="text"
-          id="instructor"
-          value={instructor}
-          onChange={(e) => setInstructor(e.target.value)}
-          required
-          className="w-full px-3 py-2 border rounded"
-        />
-      </div>
-      <div>
-        <label
           htmlFor="lessons"
           className="block mb-1"
         >
@@ -90,7 +87,6 @@ const AddCourseForm: React.FC = () => {
           onChange={(e) =>
             setLessons(e.target.value.split(',').map((lesson) => lesson.trim()))
           }
-          // required
           className="w-full px-3 py-2 border rounded"
         />
       </div>

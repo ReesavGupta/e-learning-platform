@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getLessonById } from '../api/lessonApi'
 import { Lesson } from '../types'
 
@@ -43,13 +43,30 @@ const LessonPage: React.FC = () => {
     <div className="bg-white shadow-md rounded-lg p-6">
       <h1 className="text-2xl font-bold mb-4">{lesson?.title} </h1>
       {lesson?.content ? (
-        <div
-          className="prose"
-          dangerouslySetInnerHTML={{ __html: lesson.content }}
-        ></div>
+        <>
+          <div
+            className="prose"
+            dangerouslySetInnerHTML={{ __html: lesson.content }}
+          ></div>
+
+          <div>
+            <button
+              onClick={() => navigate(`/instructor/lessons/${lessonId}/edit`)}
+              className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Edit Lesson
+            </button>
+          </div>
+        </>
       ) : (
         <p className="text-gray-500">No content available for this lesson.</p>
       )}
+      <button
+        onClick={() => navigate(`/instructor/lessons/${lessonId}/quiz/create`)}
+        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Create Quiz
+      </button>
       <button
         onClick={handleBackToCourse}
         className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"

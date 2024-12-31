@@ -70,8 +70,8 @@ export const updateLesson = async (
   if (!response.ok) {
     throw new Error('Failed to update lesson')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }
 
 export const deleteLesson = async (
@@ -85,6 +85,6 @@ export const deleteLesson = async (
   if (!response.ok) {
     throw new Error('Failed to delete lesson')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }

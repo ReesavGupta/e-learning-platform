@@ -14,13 +14,13 @@ const CreateQuizPage: React.FC = () => {
 
   const mutation = useMutation(createQuiz, {
     onSuccess: (data) => {
-      navigate(`/instructor/quizzes/${data.id}/edit`)
+      navigate(`/instructor/quizzes/${data._id}/edit`)
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate({ lessonId: lessonId!, title, questions })
+    mutation.mutate({  lessonId: lessonId!, title, questions })
   }
 
   const addQuestion = () => {

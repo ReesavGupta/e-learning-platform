@@ -30,19 +30,25 @@ const EditLessonPage: React.FC = () => {
       }),
     {
       onSuccess: () => {
-        navigate(`/courses/${lesson?.courseId}`)
+        navigate(`/courses/${lesson?.course._id}`)
       },
     }
   )
 
   const deleteMutation = useMutation(deleteLesson, {
     onSuccess: () => {
-      navigate(`/courses/${lesson?.courseId}`)
+      navigate(`/courses/${lesson?.course._id}`)
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log({
+      lessonId: lessonId!,
+      title,
+      content,
+      course: lesson?.course._id,
+    })
     updateMutation.mutate({
       lessonId: lessonId!,
       title,

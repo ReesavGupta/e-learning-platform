@@ -40,6 +40,12 @@ const EditCoursePage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log({
+      id: courseId!,
+      title,
+      description,
+      user: course?.instructor,
+    })
     updateMutation.mutate({
       id: courseId!,
       title,

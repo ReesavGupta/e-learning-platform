@@ -7,8 +7,8 @@ const router = Router()
 
 router.get(
   '/',
-  authMiddleware,
-  authorize(['admin', 'instructor']),
+  // authMiddleware,
+  // authorize(['admin', 'instructor']),
   courseController.getAllCourses
 )
 router.get('/:_id', authMiddleware, courseController.getCourse)

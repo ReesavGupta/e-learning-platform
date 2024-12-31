@@ -11,7 +11,7 @@ const CreateCoursePage: React.FC = () => {
 
   const mutation = useMutation(createCourse, {
     onSuccess: (data) => {
-      navigate(`/instructor/courses/${data.id}/edit`)
+      navigate(`/instructor/courses/${data._id}/edit`)
     },
   })
 
@@ -24,7 +24,7 @@ const CreateCoursePage: React.FC = () => {
       return
     }
 
-    mutation.mutate({ _id: '', title, description, instructor })
+    mutation.mutate({ _id: instructor, title, description, instructor })
   }
 
   return (
