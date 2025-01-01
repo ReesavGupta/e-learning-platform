@@ -2,35 +2,40 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-query'
 import { getQuizById, updateQuiz, deleteQuiz } from '../api/quizApi'
+import { Question } from '../types'
 
 const EditQuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
-  const [questions, setQuestions] = useState<any[]>([])
+  const [questions, setQuestions] = useState<Question[]>([])
 
   const {
     data: quiz,
     isLoading,
     error,
-  } = useQuery(['quiz', quizId], () => getQuizById(quizId!))
+  } = useQuery(
+    ['quiz', quizId],
+    () => getQuizById(quizId!),
+    { enabled: !!quizId } // Fetch only if quizId exists
+  )
 
   useEffect(() => {
     if (quiz) {
-      setTitle(quiz.title)
-      setQuestions(quiz.questions)
+      setTitle(quiz.data.title || '') // Default to empty string if undefined
+      setQuestions(quiz.data.questions || []) // Default to empty array if undefined
     }
   }, [quiz])
 
   const updateMutation = useMutation(updateQuiz, {
     onSuccess: () => {
-      navigate(`/lessons/${quiz?.lessonId}`)
+      navigate(`/lessons/${quiz?.data?.lesson._id}`)
     },
   })
 
   const deleteMutation = useMutation(deleteQuiz, {
     onSuccess: () => {
-      navigate(`/lessons/${quiz?.lessonId}`)
+      navigate(`/lessons/${quiz?.data?.lesson._id}`)
     },
   })
 
@@ -111,25 +116,25 @@ const EditQuizPage: React.FC = () => {
             </h3>
             <input
               type="text"
-              value={question.text}
+              value={question.text || ''} // Fallback to empty string
               onChange={(e) => updateQuestion(qIndex, e.target.value)}
               placeholder="Enter question"
               className="w-full px-3 py-2 border rounded mb-2"
             />
-            {question.options.map((option: any, oIndex: number) => (
+            {question.options?.map((option, oIndex) => (
               <div
                 key={oIndex}
                 className="flex items-center space-x-2 mb-2"
               >
                 <input
                   type="text"
-                  value={option.text}
+                  value={option.text || ''} // Fallback to empty string
                   onChange={(e) =>
                     updateOption(
                       qIndex,
                       oIndex,
                       e.target.value,
-                      option.isCorrect
+                      option.isCorrect || false // Fallback to false
                     )
                   }
                   placeholder={`Option ${oIndex + 1}`}
@@ -138,12 +143,12 @@ const EditQuizPage: React.FC = () => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={option.isCorrect}
+                    checked={!!option.isCorrect} // Ensure boolean
                     onChange={(e) =>
                       updateOption(
                         qIndex,
                         oIndex,
-                        option.text,
+                        option.text || '',
                         e.target.checked
                       )
                     }
