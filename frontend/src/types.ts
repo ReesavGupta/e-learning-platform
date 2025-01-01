@@ -33,14 +33,14 @@ export interface Option {
 }
 
 export interface Question {
-  _id: string // Added id to uniquely identify each question
+  _id?: string // Added id to uniquely identify each question
   text: string
   options: Option[]
 }
 
 export interface Quiz {
-  _id: string
-  lessonId: string
+  _id?: string
+  lesson: string
   title: string
   questions: Question[] // Changed from string[] to Question[] to hold full question objects
   createdAt?: string

@@ -5,6 +5,7 @@ const QUESTION_API_URL = 'http://localhost:3000/api/questions'
 
 // Quiz Routes
 export const createQuiz = async (quizData: Omit<Quiz, 'id'>): Promise<Quiz> => {
+  console.log('in api:', quizData)
   const response = await fetch(QUIZ_API_URL, {
     method: 'POST',
     headers: {
@@ -18,7 +19,7 @@ export const createQuiz = async (quizData: Omit<Quiz, 'id'>): Promise<Quiz> => {
     throw new Error('Failed to create quiz')
   }
 
-  return response.json()
+  return await response.json()
 }
 
 export const getAllQuizzes = async (): Promise<Quiz[]> => {

@@ -13,41 +13,85 @@ interface QuestionInput {
 class QuizController {
   public createQuiz = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      const {
-        lesson,
-        title,
-        questions,
-      }: { lesson: string; title: string; questions?: QuestionInput[] } =
-        req.body
+      try {
+        const {
+          lesson,
+          title,
+          questions,
+        }: { lesson: string; title: string; questions?: QuestionInput[] } =
+          req.body
 
-      if (!lesson || !title) {
-        res.status(400).json({ message: 'Lesson ID and title are required' })
-        return
-      }
+        console.log('Received request body:', req.body)
 
-      const lessonExists = await Lesson.findById(lesson)
-      if (!lessonExists) {
-        res.status(404).json({ message: 'Lesson not found' })
-        return
-      }
+        if (!lesson || !mongoose.Types.ObjectId.isValid(lesson)) {
+          res.status(400).json({ message: 'Invalid or missing lesson ID' })
+          return
+        }
 
-      const quiz = await Quiz.create({ lesson, title, questions: [] })
+        if (!title) {
+          res.status(400).json({ message: 'Title is required' })
+          return
+        }
 
-      if (Array.isArray(questions) && questions.length > 0) {
-        const createdQuestions = await Promise.all(
-          questions.map(async (question) => {
-            const newQuestion = await Question.create({
-              ...question,
-              quiz: quiz._id,
-            })
-            return newQuestion._id
-          })
-        )
-        quiz.questions = createdQuestions
+        console.log('Validating lesson existence...')
+        const lessonExists = await Lesson.findById(lesson)
+        if (!lessonExists) {
+          res.status(404).json({ message: 'Lesson not found' })
+          return
+        }
+
+        console.log('Creating quiz...')
+
+        const quiz = await Quiz.create({
+          lesson,
+          title,
+          questions: [],
+        })
         await quiz.save()
-      }
+        console.log('Quiz created:', quiz)
 
-      res.status(201).json({ message: 'Quiz created successfully', data: quiz })
+        if (!quiz) {
+          res.status(500).json({ message: 'Failed to create quiz' })
+          return
+        }
+
+        if (Array.isArray(questions) && questions.length > 0) {
+          console.log('Creating associated questions...')
+
+          const createdQuestions = await Promise.all(
+            questions.map(async (question) => {
+              if (!question.text || !Array.isArray(question.options)) {
+                throw new Error('Invalid question data')
+              }
+              const newQuestion = await Question.create({
+                ...question,
+                quiz: quiz._id,
+              })
+              await newQuestion.save()
+              return newQuestion._id
+            })
+          )
+
+          // Only update the quiz if questions were successfully created
+          if (createdQuestions.length > 0) {
+            quiz.questions = createdQuestions
+            await quiz.save()
+          }
+
+          console.log('Questions added to quiz:', createdQuestions)
+        }
+
+        res.status(201).json({
+          message: 'Quiz created successfully',
+          data: quiz,
+        })
+      } catch (error) {
+        console.error('Error occurred during quiz creation:', error)
+        res.status(500).json({
+          message: 'An internal error occurred',
+          error: (error as any).message,
+        })
+      }
     }
   )
 
