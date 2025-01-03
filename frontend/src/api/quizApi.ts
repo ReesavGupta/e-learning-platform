@@ -31,8 +31,8 @@ export const getAllQuizzes = async (): Promise<Quiz[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch quizzes')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }
 
 export const getQuizById = async (id: string): Promise<Quiz> => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getLessonById } from '../api/lessonApi'
+import { getAllQuizzes } from '../api/quizApi'
 import { Lesson } from '../types'
 
 const LessonPage: React.FC = () => {
@@ -10,7 +11,7 @@ const LessonPage: React.FC = () => {
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-
+  const [allQuizzes, setAllQuizzes] = useState([])
   useEffect(() => {
     const fetchLesson = async () => {
       if (!lessonId) {
@@ -28,8 +29,12 @@ const LessonPage: React.FC = () => {
         setLoading(false)
       }
     }
-
+    const getQuizzes = async () => {
+      const res = await getAllQuizzes()
+      setAllQuizzes(res.data)
+    }
     fetchLesson()
+    getQuizzes()
   }, [lessonId])
 
   const handleBackToCourse = () => {
@@ -73,6 +78,23 @@ const LessonPage: React.FC = () => {
       >
         Back to Course
       </button>
+
+      <div>
+        <h2 className="text-xl font-bold mt-6 mb-4">Quizzes</h2>
+        {allQuizzes
+          .filter((quiz) => quiz.lesson._id === lessonId)
+          .map((quiz) => (
+            <div
+              key={quiz._id}
+              className="mb-4"
+            >
+              <Link to={`/instructor/quizzes/${quiz._id}/edit`}>
+                <h3 className="text-lg font-bold">{quiz.title}</h3>
+              </Link>
+              <p>{quiz.questions.length} questions</p>
+            </div>
+          ))}
+      </div>
     </div>
   )
 }
