@@ -25,11 +25,25 @@ class ProgressController {
       }).populate('lessons.lessonId', 'title')
 
       if (!progress) {
-        res.status(404).json({ message: 'Progress not found' })
+        res.json({ data: [], message: 'Progress not found' })
         return
       }
 
-      res.status(200).json({ message: 'Progress found', data: progress })
+      // Calculate overall progress percentage
+      const totalLessons = progress.lessons.length
+      const completedLessonsCount = progress.lessons.filter(
+        (lesson: any) => lesson.completed
+      ).length
+      const overallProgress = (completedLessonsCount / totalLessons) * 100
+
+      res.status(200).json({
+        message: 'Progress found',
+        data: {
+          course: progress.course,
+          overallProgress,
+          lessons: progress.lessons,
+        },
+      })
     }
   )
 
@@ -70,7 +84,22 @@ class ProgressController {
       }
 
       await progress.updateProgress()
-      res.status(200).json({ message: 'Progress updated', data: progress })
+
+      // Calculate overall progress percentage
+      const totalLessons = progress.lessons.length
+      const completedLessonsCount = progress.lessons.filter(
+        (lesson: any) => lesson.completed
+      ).length
+      const overallProgress = (completedLessonsCount / totalLessons) * 100
+
+      res.status(200).json({
+        message: 'Progress updated',
+        data: {
+          course: progress.course,
+          overallProgress,
+          lessons: progress.lessons,
+        },
+      })
     }
   )
 

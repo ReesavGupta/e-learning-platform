@@ -14,7 +14,7 @@ const ProgressPage: React.FC = () => {
     isLoading: isCoursesLoading,
     error: coursesError,
   } = useQuery('courses', getAllCourses, {
-    enabled: !!user?.id, // Only fetch if user is available
+    enabled: !!user?._id, // Only fetch if user is available
   })
 
   useEffect(() => {
@@ -22,14 +22,17 @@ const ProgressPage: React.FC = () => {
       // For each course, fetch progress
       const fetchProgress = async () => {
         const progressPromises = courses.map(async (course) => {
-          const response = await getStudentCourseProgress(user!.id, course.id)
+          const response = await getStudentCourseProgress(user!._id, course._id)
+          console.log(response)
+
           return {
             course,
-            progress: response.data,
+            progress: response.data, // Assuming backend sends overallProgress and lessons
           }
         })
         const progressData = await Promise.all(progressPromises)
         setCourseProgress(progressData)
+        console.log('this is courseProgress:', courseProgress)
       }
 
       fetchProgress()
@@ -46,7 +49,7 @@ const ProgressPage: React.FC = () => {
       {courseProgress.length > 0 ? (
         courseProgress.map(({ course, progress }) => (
           <div
-            key={course.id}
+            key={course._id}
             className="mb-8 bg-white shadow-md rounded-lg p-6"
           >
             <h2 className="text-2xl font-semibold mb-4">{course.title}</h2>
@@ -66,7 +69,7 @@ const ProgressPage: React.FC = () => {
             </div>
 
             {/* Lessons Progress */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <h3 className="text-lg font-medium mb-2">Lessons</h3>
               <ul className="space-y-2">
                 {progress.lessons.map((lesson: any) => (
@@ -84,29 +87,7 @@ const ProgressPage: React.FC = () => {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Quizzes Progress */}
-            <div>
-              <h3 className="text-lg font-medium mb-2">Quizzes</h3>
-              <ul className="space-y-2">
-                {progress.quizzes.map((quiz: any) => (
-                  <li
-                    key={quiz.id}
-                    className="flex items-center justify-between"
-                  >
-                    <span>{quiz.title}</span>
-                    {quiz.score !== null ? (
-                      <span className="text-green-600 font-medium">
-                        Score: {quiz.score}%
-                      </span>
-                    ) : (
-                      <span className="text-gray-500">Not taken</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </div> */}
           </div>
         ))
       ) : (
