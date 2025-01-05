@@ -44,8 +44,9 @@ export const getQuizById = async (id: string): Promise<Quiz> => {
   if (!response.ok) {
     throw new Error('Failed to fetch quiz')
   }
-
-  return response.json()
+  const result = await response.json()
+  console.log(result)
+  return result.data
 }
 
 export const updateQuiz = async (quizData: {

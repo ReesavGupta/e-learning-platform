@@ -3,11 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getLessonById } from '../api/lessonApi'
 import { getAllQuizzes } from '../api/quizApi'
 import { Lesson } from '../types'
+import { useAuth } from '../contexts/AuthContext'
 
 const LessonPage: React.FC = () => {
   const { lessonId } = useParams<{ lessonId: string }>()
   const navigate = useNavigate()
-
+  const { user } = useAuth()
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -55,23 +56,29 @@ const LessonPage: React.FC = () => {
           ></div>
 
           <div>
-            <button
-              onClick={() => navigate(`/instructor/lessons/${lessonId}/edit`)}
-              className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Edit Lesson
-            </button>
+            {user?.role === 'instructor' && (
+              <button
+                onClick={() => navigate(`/instructor/lessons/${lessonId}/edit`)}
+                className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Edit Lesson
+              </button>
+            )}
           </div>
         </>
       ) : (
         <p className="text-gray-500">No content available for this lesson.</p>
       )}
-      <button
-        onClick={() => navigate(`/instructor/lessons/${lessonId}/quiz/create`)}
-        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Create Quiz
-      </button>
+      {user?.role === 'instructor' && (
+        <button
+          onClick={() =>
+            navigate(`/instructor/lessons/${lessonId}/quiz/create`)
+          }
+          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Create Quiz
+        </button>
+      )}
       <button
         onClick={handleBackToCourse}
         className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -88,9 +95,15 @@ const LessonPage: React.FC = () => {
               key={quiz._id}
               className="mb-4"
             >
-              <Link to={`/instructor/quizzes/${quiz._id}/edit`}>
-                <h3 className="text-lg font-bold">{quiz.title}</h3>
-              </Link>
+              {user?.role === 'instructor' ? (
+                <Link to={`/instructor/quizzes/${quiz._id}/edit`}>
+                  <h3 className="text-lg font-bold">{quiz.title}</h3>
+                </Link>
+              ) : (
+                <Link to={`/quizzes/${quiz._id}`}>
+                  <h3 className="text-lg font-bold">{quiz.title}</h3>
+                </Link>
+              )}
               <p>{quiz.questions.length} questions</p>
             </div>
           ))}

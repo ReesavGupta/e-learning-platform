@@ -26,6 +26,7 @@ const CourseDashboard: React.FC = () => {
           <CourseCard
             key={course._id}
             course={course}
+            user={user}
           />
         ))}
       </div>

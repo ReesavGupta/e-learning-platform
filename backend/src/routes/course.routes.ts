@@ -36,5 +36,11 @@ router.put(
   authorize(['student']),
   courseController.enrollInCourseAsStudent
 )
+router.get(
+  '/enrolled/students',
+  authMiddleware,
+  authorize(['student', 'instructor']),
+  courseController.getEnrolledCourses
+)
 
 export default router

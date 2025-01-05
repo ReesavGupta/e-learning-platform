@@ -33,8 +33,8 @@ const QuizPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (quiz && quiz.id) {
-      submitMutation.mutate({ quizId: quiz.id, answers })
+    if (quiz && quiz._id) {
+      submitMutation.mutate({ quizId: quiz._id, answers })
     }
   }
 
@@ -48,7 +48,7 @@ const QuizPage: React.FC = () => {
         <form onSubmit={handleSubmit}>
           {quiz?.questions.map((question, qIndex) => (
             <div
-              key={question.id}
+              key={question._id}
               className="mb-6"
             >
               <h3 className="text-xl font-semibold mb-2">
@@ -62,10 +62,10 @@ const QuizPage: React.FC = () => {
                   >
                     <input
                       type="radio"
-                      name={`question-${question.id}`}
+                      name={`question-${question._id}`}
                       value={oIndex}
-                      checked={answers[question.id] === oIndex}
-                      onChange={() => handleAnswerChange(question.id, oIndex)}
+                      checked={answers[question._id] === oIndex}
+                      onChange={() => handleAnswerChange(question._id, oIndex)}
                       className="form-radio"
                     />
                     <span>{option.text}</span>

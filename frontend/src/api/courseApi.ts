@@ -91,3 +91,38 @@ export const deleteCourse = async (
   const result = await response.json()
   return result
 }
+
+export const enrollStudentInCourse = async (data: {
+  userId: string
+  courseId: string
+}): Promise<{ success: boolean }> => {
+  const response = await fetch(`${API_URL}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+    credentials: 'include',
+  })
+  if (!response.ok) {
+    throw new Error('Failed to enroll student')
+  }
+  const result = await response.json()
+  return result
+}
+
+export const getEnrolledCourses = async (userId: string): Promise<Course[]> => {
+  const response = await fetch(
+    `${API_URL}/enrolled/students?userId=${userId}`,
+    {
+      method: 'GET',
+      credentials: 'include',
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch enrolled courses')
+  }
+  const result = await response.json()
+  return result
+}

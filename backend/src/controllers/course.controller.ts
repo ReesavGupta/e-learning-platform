@@ -214,7 +214,7 @@ class CourseController {
   )
 
   public enrollInCourseAsStudent = asyncHandler(
-    async (req, res): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       try {
         const { userId, courseId } = req.body
 
@@ -257,7 +257,26 @@ class CourseController {
           .json({ message: (error as any).message || 'Internal server error' })
       }
     }
-  ) 
+  )
+  public getEnrolledCourses = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const { userId } = req.query
+        if (!userId) {
+          res.status(400).json({ message: 'User ID is required' })
+          return
+        }
+
+        const enrolledCourses = await Course.find({ enrolledStudents: userId })
+
+        res.status(200).json(enrolledCourses)
+      } catch (error) {
+        res.status(500).json({
+          message: 'something went wrong while getting the enrolled users',
+        })
+      }
+    }
+  )
 }
 
 export const courseController = new CourseController()
