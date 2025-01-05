@@ -30,5 +30,11 @@ router.delete(
   authorize(['admin', 'instructor']),
   courseController.deleteCourse
 )
+router.put(
+  '/',
+  authMiddleware,
+  authorize(['student']),
+  courseController.enrollInCourseAsStudent
+)
 
 export default router

@@ -212,6 +212,52 @@ class CourseController {
       }
     }
   )
+
+  public enrollInCourseAsStudent = asyncHandler(
+    async (req, res): Promise<void> => {
+      try {
+        const { userId, courseId } = req.body
+
+        if (
+          !userId ||
+          !courseId ||
+          !mongoose.Types.ObjectId.isValid(userId) ||
+          !mongoose.Types.ObjectId.isValid(courseId)
+        ) {
+          res
+            .status(400)
+            .json({ message: 'Invalid or missing userId/courseId' })
+        } else {
+          const foundCourse = await Course.findById(courseId)
+
+          if (!foundCourse) {
+            res.status(404).json({ message: 'Course not found' })
+          } else if (foundCourse.enrolledStudents.includes(userId)) {
+            res
+              .status(400)
+              .json({ message: 'User already enrolled in this course' })
+          } else {
+            foundCourse.enrolledStudents.push(userId)
+
+            try {
+              await foundCourse.save()
+              res
+                .status(200)
+                .json({ message: 'User enrolled in course successfully' })
+            } catch (saveError) {
+              res
+                .status(500)
+                .json({ message: 'Failed to save course enrollment' })
+            }
+          }
+        }
+      } catch (error) {
+        res
+          .status(500)
+          .json({ message: (error as any).message || 'Internal server error' })
+      }
+    }
+  ) 
 }
 
 export const courseController = new CourseController()

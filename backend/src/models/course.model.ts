@@ -14,12 +14,18 @@ const CourseSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    lessons:[
+    lessons: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Lesson'
-      }
-    ]
+        ref: 'Lesson',
+      },
+    ],
+    enrolledStudents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   { timestamps: true }
 )

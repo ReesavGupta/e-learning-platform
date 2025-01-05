@@ -1,13 +1,15 @@
 import React from 'react'
 // import { Link } from 'react-router-dom'
-import { Course } from '../types'
+import { Course, User } from '../types'
 import { Link } from 'react-router-dom'
 
 interface CourseCardProps {
   course: Course
+  user: User | null
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, user }) => {
+  console.log(user)
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
       {/* <img
@@ -26,12 +28,21 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           >
             View Course
           </Link>
-          <Link
-            to={`/instructor/courses/${course._id}/edit`}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Edit Course
-          </Link>
+          {user?.role === 'student' ? (
+            <Link
+              to={`/instructor/courses/${course._id}/edit`}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Enroll
+            </Link>
+          ) : (
+            <Link
+              to={`/instructor/courses/${course._id}/edit`}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Edit Course
+            </Link>
+          )}
         </div>
       </div>
     </div>

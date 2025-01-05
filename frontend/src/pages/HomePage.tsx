@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import { getAllCourses } from '../api/courseApi'
 import CourseCard from '../components/CourseCard'
+import { useAuth } from '../contexts/AuthContext'
 
 const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const { data: courses, isLoading, error } = useQuery('courses', getAllCourses)
-
+  const { user } = useAuth()
   const filteredCourses = courses?.filter(
     (course) =>
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -15,7 +16,7 @@ const HomePage: React.FC = () => {
 
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading courses</div>
-
+  // if (user?.role) return <div>Hello student</div>
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">
@@ -35,6 +36,7 @@ const HomePage: React.FC = () => {
           <CourseCard
             key={course._id}
             course={course}
+            user={user}
           />
         ))}
       </div>
