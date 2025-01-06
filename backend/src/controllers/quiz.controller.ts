@@ -189,6 +189,63 @@ class QuizController {
       res.status(200).json({ message: 'Quiz deleted successfully' })
     }
   )
+
+  public submitQuiz = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { quizId } = req.params
+      const { answers }: { answers: Record<string, number> } = req.body
+
+      if (!quizId) {
+        res.status(400).json({ message: 'Quiz ID is required' })
+        return
+      }
+
+      if (!answers || typeof answers !== 'object') {
+        res.status(400).json({
+          message: 'Answers are required and should be in the correct format',
+        })
+        return
+      }
+
+      const quiz = await Quiz.findById(quizId).populate({
+        path: 'questions',
+        select: 'options',
+      })
+
+      if (!quiz) {
+        res.status(404).json({ message: 'Quiz not found' })
+        return
+      }
+
+      let score = 0
+      const totalQuestions = quiz.questions.length
+
+      for (const question of quiz.questions) {
+        const selectedOptionIndex = answers[question._id.toString()]
+
+        if (selectedOptionIndex === undefined) continue
+
+        const correctOption = question.options.findIndex(
+          (option) => option.isCorrect
+        )
+
+        if (selectedOptionIndex === correctOption) {
+          score += 1
+        }
+      }
+
+      const result = {
+        score,
+        totalQuestions,
+        percentage: (score / totalQuestions) * 100,
+      }
+
+      res.status(200).json({
+        message: 'Quiz submitted successfully',
+        result,
+      })
+    }
+  )
 }
 
 export const quizController = new QuizController()
