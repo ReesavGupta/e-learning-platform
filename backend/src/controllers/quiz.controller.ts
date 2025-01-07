@@ -4,6 +4,7 @@ import { Quiz } from '../models/quiz.model'
 import { Lesson } from '../models/lesson.model'
 import { Question } from '../models/question.model'
 import mongoose from 'mongoose'
+import { log } from 'console'
 
 interface QuestionInput {
   text: string
@@ -192,58 +193,114 @@ class QuizController {
 
   public submitQuiz = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      const { quizId } = req.params
-      const { answers }: { answers: Record<string, number> } = req.body
+      try {
+        const { quizId } = req.params
+        const {
+          answers,
+          userId,
+        }: { answers: Record<string, number>; userId: string } = req.body
 
-      if (!quizId) {
-        res.status(400).json({ message: 'Quiz ID is required' })
-        return
-      }
+        if (!quizId) {
+          res.status(400).json({ message: 'Quiz ID is required' })
+          return
+        }
 
-      if (!answers || typeof answers !== 'object') {
-        res.status(400).json({
-          message: 'Answers are required and should be in the correct format',
+        if (!answers || typeof answers !== 'object') {
+          res.status(400).json({
+            message: 'Answers are required and should be in the correct format',
+          })
+          return
+        }
+
+        const quiz = await Quiz.findById(quizId).populate({
+          path: 'questions',
+          select: 'options',
         })
-        return
+
+        if (!quiz) {
+          res.status(404).json({ message: 'Quiz not found' })
+          return
+        }
+
+        let score = 0
+        const totalQuestions = quiz.questions.length
+
+        for (const question of quiz.questions) {
+          const selectedOptionIndex = answers[question._id.toString()]
+          if (selectedOptionIndex === undefined) continue
+
+          const correctOption = question.options.findIndex(
+            (option) => option.isCorrect
+          )
+          if (selectedOptionIndex === correctOption) {
+            score += 1
+          }
+        }
+
+        const result = {
+          score,
+          totalQuestions,
+          percentage: (score / totalQuestions) * 100,
+        }
+
+        quiz.submissions.push({
+          userId: new mongoose.Types.ObjectId(userId),
+          result: result.percentage,
+          submittedAt: new Date(),
+        })
+
+        await quiz.save()
+
+        res.status(200).json({
+          message: 'Quiz submitted successfully',
+          result,
+        })
+      } catch (error) {
+        res.status(500).json({ message: (error as any).message })
       }
+    }
+  )
 
-      const quiz = await Quiz.findById(quizId).populate({
-        path: 'questions',
-        select: 'options',
-      })
-
-      if (!quiz) {
-        res.status(404).json({ message: 'Quiz not found' })
-        return
-      }
-
-      let score = 0
-      const totalQuestions = quiz.questions.length
-
-      for (const question of quiz.questions) {
-        const selectedOptionIndex = answers[question._id.toString()]
-
-        if (selectedOptionIndex === undefined) continue
-
-        const correctOption = question.options.findIndex(
-          (option) => option.isCorrect
+  public getQuizResult = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        console.log("heeloo")
+        const { userId, quizId } = req.params
+        console.log(userId, quizId)
+        if (!userId || !quizId) {
+          throw new Error('required: userId and quizId')
+        }
+        if (
+          !mongoose.Types.ObjectId.isValid(userId) ||
+          !mongoose.Types.ObjectId.isValid(quizId)
+        ) {
+          throw new Error('invalid userId or quizId')
+        }
+        const quiz = await Quiz.findOne(
+          { _id: quizId, 'submissions.userId': userId },
+          {
+            'submissions.$': 1, // Only include the matching submission
+          }
         )
 
-        if (selectedOptionIndex === correctOption) {
-          score += 1
+        if (!quiz || !quiz.submissions || quiz.submissions.length === 0) {
+          res
+            .status(404)
+            .json({ message: 'Quiz result not found for the specified user' })
+          return
         }
-      }
 
-      const result = {
-        score,
-        totalQuestions,
-        percentage: (score / totalQuestions) * 100,
-      }
+        const submission = quiz.submissions[0]
 
-      res.status(200).json({
-        message: 'Quiz submitted successfully',
-        result,
-      })
+        res.status(200).json({
+          message: 'Quiz result retrieved successfully',
+          result: submission,
+        })
+        return
+      } catch (error) {
+        res.status(500).json({ message: (error as any).message })
+        return
+      }
     }
   )
 }

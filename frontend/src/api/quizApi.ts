@@ -173,7 +173,7 @@ export const submitQuizAnswers = async (
   answers: Record<string, number>
 ): Promise<{ score: number }> => {
   console.log(answers)
-  const response = await fetch(`${QUIZ_API_URL}/${quizId}/submit`, {
+  const response = await fetch(`${QUIZ_API_URL}/submit/${quizId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -187,4 +187,22 @@ export const submitQuizAnswers = async (
   }
 
   return response.json()
+}
+
+export const getQuizResult = async (quizId: string, userId: string) => {
+  console.log(quizId, userId)
+  const response = await fetch(`${QUIZ_API_URL}/result/${quizId}/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch quiz result')
+  }
+
+  const result = await response.json()
+  return result
 }

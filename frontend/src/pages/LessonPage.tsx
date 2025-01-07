@@ -1,113 +1,101 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { getAllQuizzes, getQuizResult } from '../api/quizApi' // Adjust import paths as needed
 import { getLessonById } from '../api/lessonApi'
-import { getAllQuizzes } from '../api/quizApi'
-import { Lesson } from '../types'
+import { Lesson, Quiz, User } from '../types' // Adjust type imports as needed
 import { useAuth } from '../contexts/AuthContext'
 
-const LessonPage: React.FC = () => {
+const LessonPage = () => {
   const { lessonId } = useParams<{ lessonId: string }>()
-  const navigate = useNavigate()
-  const { user } = useAuth()
   const [lesson, setLesson] = useState<Lesson | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [allQuizzes, setAllQuizzes] = useState([])
+  const [allQuizzes, setAllQuizzes] = useState<Quiz[]>([])
+  const [quizResult, setQuizResult] = useState<
+    { quizId: string; score: string }[]
+  >([])
+  const { user } = useAuth()
+
   useEffect(() => {
-    const fetchLesson = async () => {
-      if (!lessonId) {
-        setError('Lesson ID is missing')
-        setLoading(false)
-        return
-      }
-
+    const fetchLessonData = async () => {
       try {
-        const fetchedLesson = await getLessonById(lessonId)
-        setLesson(fetchedLesson)
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch lesson')
-      } finally {
-        setLoading(false)
+        const lessonData = await getLessonById(lessonId)
+        setLesson(lessonData)
+      } catch (error) {
+        console.error('Error fetching lesson:', error)
       }
     }
-    const getQuizzes = async () => {
-      const res = await getAllQuizzes()
-      setAllQuizzes(res.data)
+
+    const fetchAllQuizzes = async () => {
+      try {
+        const quizzes = await getAllQuizzes()
+        // console.log(quizzes.data)
+
+        setAllQuizzes(quizzes.data)
+
+        const results = await Promise.all(
+          quizzes.data
+            .filter((quiz) => quiz.lesson._id === lessonId)
+            .map(async (quiz) => {
+              try {
+                const result = await getQuizResult(quiz._id, user?._id || "")
+                return {
+                  quizId: quiz._id,
+                  score: result?.result?.score || 'N/A',
+                }
+              } catch (error) {
+                console.error(
+                  `Error fetching result for quiz ${quiz._id}:`,
+                  error
+                )
+                return { quizId: quiz._id, score: 'Error' }
+              }
+            })
+        )
+        // console.log('this is results', results)
+        setQuizResult(results)
+      } catch (error) {
+        console.error('Error fetching quizzes:', error)
+      }
     }
-    fetchLesson()
-    getQuizzes()
-  }, [lessonId])
 
-  const handleBackToCourse = () => {
-    navigate(-1) // Navigate back to the previous page
-  }
-
-  if (loading) return <div>loading...</div>
-  if (error) return <div>{error}</div>
+    fetchLessonData()
+    fetchAllQuizzes()
+  }, [lessonId, user])
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-4">{lesson?.title} </h1>
-      {lesson?.content ? (
+    <div className="lesson-page">
+      {lesson ? (
         <>
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: lesson.content }}
-          ></div>
-
-          <div>
-            {user?.role === 'instructor' && (
-              <button
-                onClick={() => navigate(`/instructor/lessons/${lessonId}/edit`)}
-                className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Edit Lesson
-              </button>
-            )}
-          </div>
+          <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+          <p className="mb-6">{lesson.description}</p>
+          {allQuizzes
+            .filter((quiz) => quiz.lesson._id === lessonId)
+            .map((quiz) => {
+              const result = quizResult.find((r) => r.quizId === quiz._id)
+              return (
+                <div
+                  key={quiz._id}
+                  className="mb-4"
+                >
+                  {user?.role === 'instructor' ? (
+                    <Link to={`/instructor/quizzes/${quiz._id}/edit`}>
+                      <h3 className="text-lg font-bold">{quiz.title}</h3>
+                    </Link>
+                  ) : (
+                    <div className="w-[50%] flex justify-between">
+                      <Link to={`/quizzes/${quiz._id}`}>
+                        <h3 className="text-lg font-bold">{quiz.title}</h3>
+                      </Link>
+                      <h4>Result: {result?.score || 'N/A'}</h4>
+                    </div>
+                  )}
+                  <p>{quiz.questions.length} questions</p>
+                </div>
+              )
+            })}
         </>
       ) : (
-        <p className="text-gray-500">No content available for this lesson.</p>
+        <p>Loading lesson...</p>
       )}
-      {user?.role === 'instructor' && (
-        <button
-          onClick={() =>
-            navigate(`/instructor/lessons/${lessonId}/quiz/create`)
-          }
-          className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Create Quiz
-        </button>
-      )}
-      <button
-        onClick={handleBackToCourse}
-        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Back to Course
-      </button>
-
-      <div>
-        <h2 className="text-xl font-bold mt-6 mb-4">Quizzes</h2>
-        {allQuizzes
-          .filter((quiz) => quiz.lesson._id === lessonId)
-          .map((quiz) => (
-            <div
-              key={quiz._id}
-              className="mb-4"
-            >
-              {user?.role === 'instructor' ? (
-                <Link to={`/instructor/quizzes/${quiz._id}/edit`}>
-                  <h3 className="text-lg font-bold">{quiz.title}</h3>
-                </Link>
-              ) : (
-                <Link to={`/quizzes/${quiz._id}`}>
-                  <h3 className="text-lg font-bold">{quiz.title}</h3>
-                </Link>
-              )}
-              <p>{quiz.questions.length} questions</p>
-            </div>
-          ))}
-      </div>
     </div>
   )
 }

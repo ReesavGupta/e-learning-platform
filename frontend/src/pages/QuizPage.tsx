@@ -89,10 +89,10 @@ const QuizPage: React.FC = () => {
             soon.
           </p>
           <button
-            onClick={() => navigate(`/courses/${quiz?.lesson}`)}
+            onClick={() => navigate(`/lessons/${quiz?.lesson._id}`)}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Back to Course
+            Back to lesson
           </button>
         </div>
       )}

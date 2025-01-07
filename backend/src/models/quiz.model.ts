@@ -17,6 +17,21 @@ const QuizSchema = new mongoose.Schema(
         ref: 'Question',
       },
     ],
+    submissions: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+        result: {
+          type: Number,
+        },
+        submittedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

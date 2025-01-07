@@ -30,4 +30,18 @@ router.delete(
   quizController.deleteQuiz
 )
 
+router.post(
+  '/submit/:quizId',
+  authMiddleware,
+  authorize(['student']),
+  quizController.submitQuiz
+)
+
+router.get(
+  '/result/:quizId/:userId',
+  authMiddleware,
+  authorize(['student, instructor']),
+  quizController.getQuizResult
+)
+
 export default router
