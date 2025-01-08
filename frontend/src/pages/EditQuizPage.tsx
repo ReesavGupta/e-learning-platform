@@ -22,20 +22,21 @@ const EditQuizPage: React.FC = () => {
 
   useEffect(() => {
     if (quiz) {
-      setTitle(quiz.data.title || '') // Default to empty string if undefined
-      setQuestions(quiz.data.questions || []) // Default to empty array if undefined
+      console.log(quiz)
+      setTitle(quiz.title || '') // Default to empty string if undefined
+      setQuestions(quiz.questions || []) // Default to empty array if undefined
     }
   }, [quiz])
 
   const updateMutation = useMutation(updateQuiz, {
     onSuccess: () => {
-      navigate(`/lessons/${quiz?.data?.lesson._id}`)
+      navigate(`/lessons/${quiz?.lesson._id}`)
     },
   })
 
   const deleteMutation = useMutation(deleteQuiz, {
     onSuccess: () => {
-      navigate(`/lessons/${quiz?.data?.lesson._id}`)
+      navigate(`/lessons/${quiz?.lesson._id}`)
     },
   })
 

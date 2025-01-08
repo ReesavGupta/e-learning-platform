@@ -13,9 +13,10 @@ const authMiddleware = async (
 ) => {
   const token =
     req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '')
-
   if (!token) {
-    res.status(401).json({ message: 'Not authorized to access this route' })
+    res
+      .status(401)
+      .json({ message: 'You are not authorized to access this route' })
     return
   }
   try {
@@ -31,7 +32,6 @@ const authMiddleware = async (
     if (typeof decodedToken === 'object' && decodedToken !== null) {
       req.user = { id: decodedToken._id, role: decodedToken.role }
     }
-
     next()
   } catch (err) {
     res.status(401).json({ message: 'Token is not valid' })

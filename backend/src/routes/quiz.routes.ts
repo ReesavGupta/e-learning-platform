@@ -40,7 +40,7 @@ router.post(
 router.get(
   '/result/:quizId/:userId',
   authMiddleware,
-  authorize(['student, instructor']),
+  authorize(['student', 'instructor']),
   quizController.getQuizResult
 )
 

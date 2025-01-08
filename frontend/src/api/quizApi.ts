@@ -1,4 +1,4 @@
-import { Quiz, Question } from '../types'
+import { Quiz, Question, User } from '../types'
 
 const QUIZ_API_URL = 'http://localhost:3000/api/quizzes'
 const QUESTION_API_URL = 'http://localhost:3000/api/questions'
@@ -66,8 +66,8 @@ export const updateQuiz = async (quizData: {
   if (!response.ok) {
     throw new Error('Failed to update quiz')
   }
-
-  return response.json()
+  const result = await response.json()
+  return result
 }
 
 export const deleteQuiz = async (id: string): Promise<{ success: boolean }> => {
@@ -170,15 +170,17 @@ export const deleteQuestion = async (
 
 export const submitQuizAnswers = async (
   quizId: string,
-  answers: Record<string, number>
+  answers: Record<string, number>,
+  userId: string
 ): Promise<{ score: number }> => {
   console.log(answers)
+  console.log(userId)
   const response = await fetch(`${QUIZ_API_URL}/submit/${quizId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ answers }),
+    body: JSON.stringify({ answers, userId }),
     credentials: 'include',
   })
 
@@ -198,11 +200,13 @@ export const getQuizResult = async (quizId: string, userId: string) => {
     },
     credentials: 'include',
   })
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch quiz result')
+  // console.log(response)
+  if (response.status === 404) {
+    console.log('asdasdasdasdasdasdsaddasdsa')
+    return 'Not Attempted'
   }
 
   const result = await response.json()
+  // console.log(`in api ${result.submission.userId}`)
   return result
 }

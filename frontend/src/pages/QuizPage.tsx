@@ -2,13 +2,16 @@ import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-query'
 import { getQuizById, submitQuizAnswers } from '../api/quizApi'
-
+import { useAuth } from '../contexts/AuthContext'
+import { User } from '../types'
 const QuizPage: React.FC = () => {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
-
+  const { user } = useAuth()
+  const userId = user?._id
+  // console.log(userId)
   const {
     data: quiz,
     isLoading,
@@ -18,8 +21,11 @@ const QuizPage: React.FC = () => {
   })
 
   const submitMutation = useMutation(
-    (data: { quizId: string; answers: Record<string, number> }) =>
-      submitQuizAnswers(data.quizId, data.answers),
+    (data: {
+      quizId: string
+      answers: Record<string, number>
+      userId: string
+    }) => submitQuizAnswers(data.quizId, data.answers, data.userId),
     {
       onSuccess: () => {
         setSubmitted(true)
@@ -33,8 +39,8 @@ const QuizPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (quiz && quiz._id) {
-      submitMutation.mutate({ quizId: quiz._id, answers })
+    if (quiz && quiz._id && userId) {
+      submitMutation.mutate({ quizId: quiz._id, answers, userId })
     }
   }
 

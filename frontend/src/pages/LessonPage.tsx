@@ -36,10 +36,18 @@ const LessonPage = () => {
             .filter((quiz) => quiz.lesson._id === lessonId)
             .map(async (quiz) => {
               try {
-                const result = await getQuizResult(quiz._id, user?._id || "")
+                const result = await getQuizResult(quiz._id, user?._id || '')
+                console.log(result)
+                if (result === 'Not Attempted') {
+                  return {
+                    quizId: quiz._id,
+                    score: result,
+                  }
+                }
+
                 return {
                   quizId: quiz._id,
-                  score: result?.result?.score || 'N/A',
+                  score: result?.submission?.result,
                 }
               } catch (error) {
                 console.error(
@@ -66,7 +74,16 @@ const LessonPage = () => {
       {lesson ? (
         <>
           <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
-          <p className="mb-6">{lesson.description}</p>
+          <p className="mb-6">{lesson.content}</p>
+          {user?.role === 'instructor' ? (
+            <div>
+              <Link to={`/instructor/lessons/${lesson._id}/quiz/create`}>
+                Create Quiz
+              </Link>
+            </div>
+          ) : (
+            <div></div>
+          )}
           {allQuizzes
             .filter((quiz) => quiz.lesson._id === lessonId)
             .map((quiz) => {
@@ -85,7 +102,7 @@ const LessonPage = () => {
                       <Link to={`/quizzes/${quiz._id}`}>
                         <h3 className="text-lg font-bold">{quiz.title}</h3>
                       </Link>
-                      <h4>Result: {result?.score || 'N/A'}</h4>
+                      <h4>Result: {result?.score}%</h4>
                     </div>
                   )}
                   <p>{quiz.questions.length} questions</p>

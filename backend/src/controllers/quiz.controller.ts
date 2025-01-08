@@ -242,9 +242,9 @@ class QuizController {
           totalQuestions,
           percentage: (score / totalQuestions) * 100,
         }
-
+        console.log('while submitting: ', userId)
         quiz.submissions.push({
-          userId: new mongoose.Types.ObjectId(userId),
+          userId: userId,
           result: result.percentage,
           submittedAt: new Date(),
         })
@@ -264,9 +264,7 @@ class QuizController {
   public getQuizResult = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       try {
-        console.log("heeloo")
         const { userId, quizId } = req.params
-        console.log(userId, quizId)
         if (!userId || !quizId) {
           throw new Error('required: userId and quizId')
         }
@@ -282,6 +280,7 @@ class QuizController {
             'submissions.$': 1, // Only include the matching submission
           }
         )
+        // console.log(quiz)
 
         if (!quiz || !quiz.submissions || quiz.submissions.length === 0) {
           res
@@ -291,10 +290,10 @@ class QuizController {
         }
 
         const submission = quiz.submissions[0]
-
+        // console.log('this is : ', submission)
         res.status(200).json({
           message: 'Quiz result retrieved successfully',
-          result: submission,
+          submission,
         })
         return
       } catch (error) {
