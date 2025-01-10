@@ -9,23 +9,24 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, user }) => {
+  console.log(course)
   const [isEnrolled, setIsEnrolled] = useState(false)
-
-  useEffect(() => {
-    const checkEnrollment = async () => {
-      if (user) {
-        try {
-          const enrolledCourses = await getEnrolledCourses(user._id)
-          const enrolled = enrolledCourses.some(
-            (enrolledCourse) => enrolledCourse._id === course._id
-          )
-          setIsEnrolled(enrolled)
-        } catch (error) {
-          console.error('Failed to fetch enrollment status:', error)
-        }
+  const [isInstructor, setIsInstructor] = useState<boolean>(false)
+  const checkEnrollment = async () => {
+    if (user) {
+      try {
+        const enrolledCourses = await getEnrolledCourses(user._id)
+        const enrolled = enrolledCourses.some(
+          (enrolledCourse) => enrolledCourse._id === course._id
+        )
+        setIsEnrolled(enrolled)
+      } catch (error) {
+        console.error('Failed to fetch enrollment status:', error)
       }
     }
-
+  }
+  const checkIsInstructor = async () => {}
+  useEffect(() => {
     checkEnrollment()
   }, [course._id, user])
 
@@ -63,12 +64,19 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, user }) => {
             >
               Enroll
             </button>
+          ) : user?._id === course.instructor?._id ? (
+            <Link
+              to={`/courses/${course._id}`}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+            >
+              Manage Course
+            </Link>
           ) : (
             <Link
-              to={`/instructor/courses/${course._id}/edit`}
+              to={`/courses/${course._id}`}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
-              Edit Course
+              View Course
             </Link>
           )}
         </div>

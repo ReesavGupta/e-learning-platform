@@ -26,7 +26,7 @@ const CourseDetails: React.FC = () => {
         <h2 className="text-2xl font-semibold mb-4">Lessons</h2>
         <LessonList courseId={courseId!} />
       </div>
-      {user?.role === 'instructor' && (
+      {user?._id === course?.instructor?._id && (
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Add New Lesson</h2>
           <AddLessonForm courseId={courseId!} />

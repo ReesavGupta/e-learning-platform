@@ -62,6 +62,7 @@ class CourseController {
   public getAllCourses = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       try {
+        console.log('im in get allcourse ')
         const allCourses = await Course.aggregate([
           {
             $lookup: {
@@ -116,6 +117,7 @@ class CourseController {
   public getCourse = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       try {
+        console.log('im in get course by id')
         const courseId = req.params._id
 
         if (!mongoose.Types.ObjectId.isValid(courseId)) {
