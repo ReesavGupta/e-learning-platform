@@ -52,12 +52,7 @@ const InstructorDashboard: React.FC = () => {
                 >
                   Edit Course
                 </Link>
-                <Link
-                  to={`/instructor/courses/${userCourses._id}/progress`}
-                  className="text-green-600 hover:underline"
-                >
-                  View Progress
-                </Link>
+
                 <Link
                   to={`/courses/${userCourses._id}`}
                   className="text-green-600 hover:underline"

@@ -10,7 +10,6 @@ import CourseDetails from './pages/CourseDetails'
 import LessonPage from './pages/LessonPage'
 import QuizPage from './pages/QuizPage'
 import ProfilePage from './pages/ProfilePage'
-import ProgressPage from './pages/ProgressPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import InstructorDashboard from './pages/InstructorDashboard'
 import CreateCoursePage from './pages/CreateCoursePage'
@@ -19,7 +18,6 @@ import CreateLessonPage from './pages/CreateLessonPage'
 import EditLessonPage from './pages/EditLessonPage'
 import CreateQuizPage from './pages/CreateQuizPage'
 import EditQuizPage from './pages/EditQuizPage'
-import StudentProgressPage from './pages/StudentProgressPage'
 
 const queryClient = new QueryClient()
 
@@ -84,14 +82,6 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/progress"
-                  element={
-                    <ProtectedRoute>
-                      <ProgressPage />
-                    </ProtectedRoute>
-                  }
-                />
 
                 {/* Instructor routes */}
                 <Route
@@ -147,14 +137,6 @@ function App() {
                   element={
                     <ProtectedRoute requiredRole="instructor">
                       <EditQuizPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/instructor/courses/:courseId/progress"
-                  element={
-                    <ProtectedRoute requiredRole="instructor">
-                      <StudentProgressPage />
                     </ProtectedRoute>
                   }
                 />

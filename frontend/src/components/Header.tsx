@@ -42,14 +42,7 @@ const Header: React.FC = () => {
                     Profile
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/progress"
-                    className="hover:text-blue-200"
-                  >
-                    Progress
-                  </Link>
-                </li>
+
                 <li>
                   <button
                     onClick={logout}
